@@ -1,0 +1,14 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:svc-no-cost-frequency",
+  "@type": "Service",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ],
+  "name": "Children's Social Care - Referral & Assessment",
+  "type": ["social-worker-support"],
+  "contact": [
+    { "@type": "Contact", "email": ["contact@example.org"] }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "invalid-bad-enum.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementAvailability.uascStatus"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementRequirements.needsAssessmentMethod"
+    },
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "placementRequirements.pets"
+    },
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "placementRequirements.specificCommunicationRequirement"
+    },
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "riskAssessment.riskSelfHarm"
+    }
+  ],
+  "invalid-cost-out-of-range.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "actualPlacement.placementSource"
+    },
+    {
+      "code": "out-of-range",
+      "jsonPath": "actualPlacement.totalWeeklyCost"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementAvailability.uascStatus"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementRequirements.needsAssessmentMethod"
+    }
+  ],
+  "invalid-missing-required.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementAvailability.uascStatus"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementRequirements.needsAssessmentMethod"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "riskAssessment"
+    }
+  ],
+  "invalid-negative-cost.jsonld": [
+    {
+      "code": "out-of-range",
+      "jsonPath": "actualPlacement.otherWeeklyCost"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "actualPlacement.placementSource"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementAvailability.uascStatus"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementRequirements.needsAssessmentMethod"
+    }
+  ],
+  "invalid-other-missing-text.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementAvailability.uascStatus"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementRequirements.needsAssessmentMethod"
+    }
+  ],
+  "invalid-postcode.jsonld": [
+    {
+      "code": "bad-format",
+      "jsonPath": "actualPlacement.placementLocation"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "actualPlacement.placementSource"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementAvailability.uascStatus"
+    },
+    {
+      "code": "required-field-missing",
+      "jsonPath": "placementRequirements.needsAssessmentMethod"
+    }
+  ]
+}

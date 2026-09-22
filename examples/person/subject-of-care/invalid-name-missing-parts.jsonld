@@ -1,0 +1,13 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-9013456789",
+  "@type": "Person",
+
+  "identifier":    [ { "@type": "Identifier", "value": "9013456789", "system": "https://fhir.nhs.uk/Id/nhs-number" } ],
+  "name":          [ { "@type": "Name", "familyName": ["Only"], "use": "official" } ],
+  "dateOfBirth":   { "@type": "PartialDate", "date": "1990-06-01", "accuracyIndicator": "AAA" },
+  "isDeceased":    false,
+  "address":       [ { "@type": "Address", "line1": "1 High Street", "city": "Anytown", "postcode": "AB1 2CD" } ],
+  "genderCode":    "1",
+  "ethnicityCode": "13"
+}

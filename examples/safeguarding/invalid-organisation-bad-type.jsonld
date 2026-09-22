@@ -1,0 +1,17 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:org-bad-type",
+  "@type": "Organisation",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "12345678", "system": "https://example.org/Id/example-organisation" }
+  ],
+  "name": "Anytown Metropolitan Borough Council",
+  "type": ["not-a-real-organisation-type"],
+  "contact": [
+    { "@type": "Contact", "email": ["contact@example.org"] }
+  ],
+  "relatedService": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ]
+}

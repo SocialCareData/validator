@@ -1,0 +1,25 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:org-anytown-la",
+  "@type": "Organisation",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "12345678", "system": "https://identifiers.company-information.service.gov.uk/company-number" }
+  ],
+  "name": "Anytown Metropolitan Borough Council",
+  "alias": ["Anytown Council"],
+  "type": ["local-authority"],
+  "active": true,
+  "address": [
+    { "@type": "Address", "line1": "1 High Street", "city": "Anytown", "postcode": "AB1 2CD" }
+  ],
+  "contact": [
+    { "@type": "Contact", "name": "Main", "email": ["contact@example.org"], "telephone": ["+44 7946 0000"] }
+  ],
+  "relatedProfessional": [
+    { "@type": "Identifier", "value": "PRF-001", "system": "https://example.org/Id/professional" }
+  ],
+  "relatedService": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ]
+}

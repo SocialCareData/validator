@@ -1,0 +1,18 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000006",
+  "@type": "Person",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "9100000006", "system": "https://fhir.nhs.uk/Id/nhs-number" }
+  ],
+
+  "name": [
+    { "@type": "Name", "familyName": ["Brown"], "givenName": ["Sam"], "use": "official" }
+  ],
+
+  "contact": [
+    { "@type": "Contact", "name": "Home", "email": ["sam.brown@example.org"], "telephone": ["+44 20 7946 0200"] },
+    { "@type": "Contact", "name": "Work", "email": ["sam.brown@work.example.org"], "telephone": ["+44 20 7946 0201"] }
+  ]
+}

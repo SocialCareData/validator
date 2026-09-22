@@ -1,0 +1,16 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:org-no-name",
+  "@type": "Organisation",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "12345678", "system": "https://example.org/Id/example-organisation" }
+  ],
+  "type": ["local-authority"],
+  "contact": [
+    { "@type": "Contact", "email": ["contact@example.org"] }
+  ],
+  "relatedService": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ]
+}

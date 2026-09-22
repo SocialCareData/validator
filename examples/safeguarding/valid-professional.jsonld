@@ -1,0 +1,27 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:prf-001",
+  "@type": "Professional",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "SW1234567", "system": "https://example.org/Id/registration" }
+  ],
+  "name": {
+    "@type": "Name",
+    "familyName": ["Doe"],
+    "givenName": ["Jane", "Elizabeth"],
+    "preferredName": "Janie",
+    "use": "official"
+  },
+  "role": ["Social Worker", "Team Lead - Referral & Assessment"],
+  "status": true,
+  "contact": {
+    "@type": "Contact",
+    "name": "Work",
+    "email": ["jane.doe@example.org"],
+    "telephone": ["+44 7946 0000"]
+  },
+  "relatedService": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ]
+}

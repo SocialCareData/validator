@@ -1,0 +1,25 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:ep-bad-outcome",
+  "@type": "ServiceEpisode",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "EP-2026-0002", "system": "https://example.org/Id/episode" }
+  ],
+  "type": ["cin-plan"],
+  "subjectPerson": [
+    {
+      "@type": "SubjectPerson",
+      "person": { "@type": "Identifier", "value": "9434765919", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+      "involvement": "SBJ"
+    }
+  ],
+  "relatedService": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ],
+  "timeInformation": [
+    { "@type": "TimeInformation", "startDateTime": "2026-05-01T09:30:00Z" }
+  ],
+  "location": ["Anytown Family Centre"],
+  "outcome": "not-a-real-outcome"
+}

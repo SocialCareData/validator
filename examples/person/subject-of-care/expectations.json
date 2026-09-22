@@ -1,0 +1,74 @@
+{
+  "invalid-bad-accuracy-indicator.jsonld": [
+    {
+      "code": "bad-format",
+      "jsonPath": "dateOfBirth.accuracyIndicator"
+    }
+  ],
+  "invalid-bad-gender.jsonld": [
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "genderCode"
+    }
+  ],
+  "invalid-bad-postcode.jsonld": [
+    {
+      "code": "bad-format",
+      "jsonPath": "address[0].postcode"
+    }
+  ],
+  "invalid-missing-address.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "address"
+    }
+  ],
+  "invalid-missing-dateOfBirth.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "dateOfBirth"
+    }
+  ],
+  "invalid-missing-ethnicityCode.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "ethnicityCode"
+    }
+  ],
+  "invalid-missing-genderCode.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "genderCode"
+    }
+  ],
+  "invalid-missing-identifier.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "identifier"
+    }
+  ],
+  "invalid-missing-isDeceased.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "isDeceased"
+    }
+  ],
+  "invalid-missing-name.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "name"
+    }
+  ],
+  "invalid-multiple-names.jsonld": [
+    {
+      "code": "too-many-values",
+      "jsonPath": "name"
+    }
+  ],
+  "invalid-name-missing-parts.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "name[0].givenName"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:svc-001",
+  "@type": "Service",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ],
+  "name": "Children's Social Care - Referral & Assessment",
+  "type": ["social-worker-support"],
+  "active": true,
+  "contact": [
+    { "@type": "Contact", "name": "Duty Desk", "email": ["contact@example.org"], "telephone": ["+44 7946 0000"] }
+  ],
+  "costFrequency": "none",
+  "delivery": ["community"],
+  "relatedOrganisation": [
+    { "@type": "Identifier", "value": "12345678", "system": "https://example.org/Id/example-organisation" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000005",
+  "@type": "Person",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "9100000005", "system": "https://fhir.nhs.uk/Id/nhs-number" }
+  ],
+
+  "name": [
+    { "@type": "Name", "familyName": ["Doe"],   "givenName": ["Mary"], "use": "official" },
+    { "@type": "Name", "familyName": ["Smith"], "givenName": ["Mary"], "use": "maiden" }
+  ]
+}

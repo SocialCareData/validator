@@ -1,0 +1,82 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:ABCD2012-001",
+  "@type": "Placement",
+
+  "childId": "ABCD2012",
+
+  "placementAvailability": {
+    "@id": "ex:ABCD2012-001/availability",
+    "@type": "PlacementAvailability",
+    "neededBy": "< 5 days",
+    "siblingCount": 2,
+    "uascStatus": "No"
+  },
+
+  "placementRequirements": {
+    "@id": "ex:ABCD2012-001/requirements",
+    "@type": "PlacementRequirements",
+    "communicationNeeds": "Not Specified",
+    "specificCommunicationRequirement": ["ESOL"],
+    "culturalNeeds": "Required",
+    "livingCompanions": "Only With Other younger children",
+    "pets": "No",
+    "additionalSupport": ["TaxisToSchool"],
+    "deprivationOfLiberty": true,
+    "needsAssessmentMethod": "BERRI"
+  },
+
+  "placementRecommendation": {
+    "@id": "ex:ABCD2012-001/recommendation",
+    "@type": "PlacementRecommendation",
+    "fosterCareSuitability": "Preferred",
+    "residentialCareSuitability": "Suitable but not preferred",
+    "supportedAccommodationSuitability": "Unsuitable"
+  },
+
+  "riskAssessment": {
+    "@id": "ex:ABCD2012-001/risk",
+    "@type": "RiskAssessment",
+    "riskSelfHarm":             "Risk Present",
+    "riskCriminalExploitation": "No known risk",
+    "riskDrugAlcohol":          "No known risk",
+    "riskEatingDisorder":       "No known risk",
+    "riskMissing":              "Risk Present",
+    "riskSexualExploitation":   "No known risk",
+    "riskToOthersPhysical":     "No known risk",
+    "riskToOthersSexual":       "No known risk",
+    "riskToOthersFire":         "No known risk",
+    "riskToOthersAnimals":      "No known risk",
+    "riskToOthersCriminal":     "No known risk"
+  },
+
+  "actualPlacement": {
+    "@id": "ex:ABCD2012-001/actual",
+    "@type": "ActualPlacement",
+    "coreWeeklyCost":               2500.00,
+    "additionalSupportWeeklyCost":  1500.00,
+    "educationWeeklyCost":             0.00,
+    "otherWeeklyCost":               500.00,
+    "totalWeeklyCost":              4500.00,
+    "placementLocation": "N18",
+    "isLocationPreferred": true,
+    "nonPreferredLocationReason": "Not applicable",
+    "isEducationContinuous": false,
+    "providerURN": "ABCD10293002",
+    "siblingsPlacedTogether": 1,
+    "placementType": "Residential",
+    "placementStartDate": "2024-03-21",
+    "placementSource": "Block contract"
+  },
+
+  "qualityAssurance": {
+    "@id": "ex:ABCD2012-001/qa",
+    "@type": "QualityAssurance",
+    "referralOfficerName": "Alex Brown",
+    "referralDate":  "2024-02-12",
+    "placementOfficerName": "Beth Green",
+    "placementDateAdmin": "2024-03-21",
+    "costOfficerName": "Casey White",
+    "costDate":      "2024-03-25"
+  }
+}

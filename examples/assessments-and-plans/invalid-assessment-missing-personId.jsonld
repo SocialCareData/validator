@@ -1,0 +1,37 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:invalid-assessment-001",
+  "@type": "CareNeedsAssessment",
+  "identifier": {
+    "@type": "Identifier",
+    "value": "ASS-2026-002",
+    "system": "https://example.org/Id/assessment"
+  },
+  "professionalId": {
+    "@type": "Identifier",
+    "value": "SW-10293",
+    "system": "https://example.org/Id/registration"
+  },
+  "dateCompleted": "2026-08-11T14:30:00Z",
+  "capacityToCompleteAssessment": true,
+  "advocateRequired": false,
+  "consentToInformationSharing": true,
+  "review": [
+    {
+      "@type": "Review",
+      "isReview": false
+    }
+  ],
+  "status": "active",
+  "assessmentQuestion": [
+    {
+      "@type": "AssessmentQuestion",
+      "questionId": "STAT-HOUSING-01",
+      "category": "Housing",
+      "questionText": "Does the person live alone?",
+      "answer": ["Yes"],
+      "answerType": "Boolean",
+      "required": true
+    }
+  ]
+}

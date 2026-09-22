@@ -1,0 +1,16 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000002",
+  "@type": "Person",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "9100000002", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+    { "@type": "Identifier", "value": "LA-22222",   "system": "https://example.org/Id/local-authority-id" }
+  ],
+
+  "name": [
+    { "@type": "Name", "familyName": ["Brown"], "givenName": ["Tom"], "use": "official" }
+  ],
+
+  "dateOfBirth": { "@type": "PartialDate", "date": "1980-03-22", "accuracyIndicator": "AAA" }
+}

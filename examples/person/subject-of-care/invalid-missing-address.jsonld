@@ -1,0 +1,12 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-9006789012",
+  "@type": "Person",
+
+  "identifier":    [ { "@type": "Identifier", "value": "9006789012", "system": "https://fhir.nhs.uk/Id/nhs-number" } ],
+  "name":          [ { "@type": "Name", "familyName": ["Doe"], "givenName": ["John"], "use": "official" } ],
+  "dateOfBirth":   { "@type": "PartialDate", "date": "1990-06-01", "accuracyIndicator": "AAA" },
+  "isDeceased":    false,
+  "genderCode":    "1",
+  "ethnicityCode": "13"
+}

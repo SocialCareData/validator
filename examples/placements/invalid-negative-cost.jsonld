@@ -1,0 +1,75 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:INVALID-005",
+  "@type": "Placement",
+
+  "placementId": "PLC-INVALID-005",
+  "childId": "INVALID005",
+
+  "placementAvailability": {
+    "@id": "ex:INVALID-005/availability",
+    "@type": "PlacementAvailability",
+    "neededBy": "MoreThanFiveDays"
+  },
+
+  "placementRequirements": {
+    "@id": "ex:INVALID-005/requirements",
+    "@type": "PlacementRequirements",
+    "communicationNeeds": "No",
+    "specificCommunicationRequirement": ["None"],
+    "culturalNeeds": "NotRequired",
+    "livingCompanions": "NoPreference",
+    "pets": "YesCan",
+    "homeAdaptationRequired": false
+  },
+
+  "placementRecommendation": {
+    "@id": "ex:INVALID-005/recommendation",
+    "@type": "PlacementRecommendation",
+    "fosterCareSuitability": "Preferred",
+    "residentialCareSuitability": "NotSpecified",
+    "supportedAccommodationSuitability": "NotSpecified"
+  },
+
+  "riskAssessment": {
+    "@id": "ex:INVALID-005/risk",
+    "@type": "RiskAssessment",
+    "riskSelfHarm":             "NoKnownRisk",
+    "riskCriminalExploitation": "NoKnownRisk",
+    "riskDrugAlcohol":          "NoKnownRisk",
+    "riskEatingDisorder":       "NoKnownRisk",
+    "riskMissing":              "NoKnownRisk",
+    "riskSexualExploitation":   "NoKnownRisk",
+    "riskToOthersPhysical":     "NoKnownRisk",
+    "riskToOthersSexual":       "NoKnownRisk",
+    "riskToOthersFire":         "NoKnownRisk",
+    "riskToOthersAnimals":      "NoKnownRisk",
+    "riskToOthersCriminal":     "NoKnownRisk"
+  },
+
+  "actualPlacement": {
+    "@id": "ex:INVALID-005/actual",
+    "@type": "ActualPlacement",
+    "placementType": "Foster",
+    "placementStartDate": "2024-03-21",
+    "providerURN": "URN-7777",
+    "placementLocation": "TA3",
+    "isLocationPreferred": true,
+    "nonPreferredLocationReason": "Not applicable",
+    "isEducationContinuous": true,
+    "siblingsPlacedTogether": 0,
+    "totalWeeklyCost":             1800.00,
+    "coreWeeklyCost":              1500.00,
+    "additionalSupportWeeklyCost":  350.00,
+    "otherWeeklyCost":              -50.00
+  },
+
+  "qualityAssurance": {
+    "@id": "ex:INVALID-005/qa",
+    "@type": "QualityAssurance",
+    "referralDate":  "2024-02-12",
+    "placementOfficerName": "Beth Green",
+    "placementDateAdmin": "2024-03-21",
+    "costDate":      "2024-03-25"
+  }
+}

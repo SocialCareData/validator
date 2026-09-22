@@ -1,0 +1,13 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-9012345678",
+  "@type": "Person",
+
+  "identifier":    [ { "@type": "Identifier", "value": "9012345678", "system": "https://fhir.nhs.uk/Id/nhs-number" } ],
+  "name":          [ { "@type": "Name", "familyName": ["Roe"], "givenName": ["Pat"], "use": "official" } ],
+  "dateOfBirth":   { "@type": "PartialDate", "date": "1990-06-01", "accuracyIndicator": "AAA" },
+  "isDeceased":    false,
+  "address":       [ { "@type": "Address", "line1": "5 Bad Street", "city": "Nowhere", "postcode": "NOT A POSTCODE" } ],
+  "genderCode":    "1",
+  "ethnicityCode": "13"
+}

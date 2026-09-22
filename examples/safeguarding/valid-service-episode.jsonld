@@ -1,0 +1,71 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:ep-2026-0001",
+  "@type": "ServiceEpisode",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "EP-2026-0001", "system": "https://example.org/Id/episode" }
+  ],
+  "type": ["cin-plan"],
+  "subjectPerson": [
+    {
+      "@type": "SubjectPerson",
+      "person": { "@type": "Identifier", "value": "9434765919", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+      "involvement": "SBJ"
+    }
+  ],
+  "relatedProfessional": [
+    {
+      "@type": "RelatedProfessional",
+      "professional": { "@type": "Identifier", "value": "SW1234567", "system": "https://example.org/Id/registration" },
+      "involvement": "PPRF"
+    }
+  ],
+  "relatedService": [
+    { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+  ],
+  "timeInformation": [
+    {
+      "@type": "TimeInformation",
+      "startDateTime": "2026-05-01T09:30:00Z",
+      "endDateTime": "2026-05-01T11:00:00Z",
+      "frequency": {
+        "repeat": {
+          "dayOfWeek": ["tue"],
+          "frequency": 1,
+          "period": 1,
+          "periodUnit": "wk"
+        }
+      }
+    }
+  ],
+  "location": ["Anytown Family Centre"],
+  "finding": [
+    {
+      "@type": "Finding",
+      "observation": [
+        {
+          "@type": "Observation",
+          "type": "NEET",
+          "startDate": "2026-03-15T13:02:00",
+          "endDate": "2026-06-30T10:20:00"
+        },
+        {
+          "@type": "Observation",
+          "type": "SEND.SpLD",
+          "startDate": "2026-03-15T13:02:00"
+        }
+      ],
+      "measurement": [
+        {
+          "@type": "Measurement",
+          "value": 12,
+          "unit": "count",
+          "type": "Authorised Absences"
+        }
+      ],
+      "text": ["Home environment observed to be stable and supportive."]
+    }
+  ],
+  "outcome": "continuation"
+}

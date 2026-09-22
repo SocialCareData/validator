@@ -1,0 +1,56 @@
+{
+  "invalid-episode-bad-outcome.jsonld": [
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "outcome"
+    }
+  ],
+  "invalid-episode-missing-subjectPerson.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "subjectPerson"
+    }
+  ],
+  "invalid-measurement-bad-unit.jsonld": [
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "finding[0].measurement[0].unit"
+    }
+  ],
+  "invalid-organisation-bad-postcode.jsonld": [
+    {
+      "code": "bad-format",
+      "jsonPath": "address[0].postcode"
+    }
+  ],
+  "invalid-organisation-bad-type.jsonld": [
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "type"
+    }
+  ],
+  "invalid-organisation-missing-name.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "name"
+    }
+  ],
+  "invalid-organisation-missing-relatedService.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "relatedService"
+    }
+  ],
+  "invalid-professional-missing-name.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "name"
+    }
+  ],
+  "invalid-service-missing-costFrequency.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "costFrequency"
+    }
+  ]
+}

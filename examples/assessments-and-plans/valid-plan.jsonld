@@ -1,0 +1,70 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:plan-001",
+  "@type": "CarePlan",
+  "identifier": {
+    "@type": "Identifier",
+    "value": "PLAN-2026-001",
+    "system": "https://example.org/Id/plan"
+  },
+  "personId": {
+    "@type": "Identifier",
+    "value": "9434765919",
+    "system": "https://fhir.nhs.uk/Id/nhs-number"
+  },
+  "professionalId": {
+    "@type": "Identifier",
+    "value": "SW-10293",
+    "system": "https://example.org/Id/registration"
+  },
+  "dateCompleted": "2026-08-11T14:45:00Z",
+  "capacityToCompleteAssessment": true,
+  "advocateRequired": false,
+  "consentToInformationSharing": true,
+  "serviceEpisodeId": [
+    {
+      "@type": "Identifier",
+      "value": "EP-2026-0001",
+      "system": "https://example.org/Id/episode"
+    }
+  ],
+  "review": [
+    {
+      "@type": "Review",
+      "isReview": false
+    }
+  ],
+  "assessmentId": {
+    "@type": "Identifier",
+    "value": "ASS-2026-001",
+    "system": "https://example.org/Id/assessment"
+  },
+  "status": "active",
+  "careComponent": [
+    {
+      "@type": "CareComponent",
+      "actor": [
+        {
+          "@type": "CareActor",
+          "actorType": "Professional services",
+          "actorId": {
+            "@type": "Identifier",
+            "value": "SRV-MEALS-001",
+            "system": "https://example.org/Id/service"
+          }
+        }
+      ],
+      "time": {
+        "@type": "CareTiming",
+        "frequency": "Daily",
+        "startDateTime": "2026-08-12T12:00:00Z"
+      },
+      "activity": {
+        "@type": "CareActivity",
+        "activityDescription": "Deliver hot meals daily at lunchtime.",
+        "outcome": "CA-NUTRITION",
+        "directPayment": false
+      }
+    }
+  ]
+}

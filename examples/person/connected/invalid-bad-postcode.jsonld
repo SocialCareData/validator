@@ -1,0 +1,17 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000009",
+  "@type": "Person",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "9100000009", "system": "https://fhir.nhs.uk/Id/nhs-number" }
+  ],
+
+  "name": [
+    { "@type": "Name", "familyName": ["West"], "givenName": ["Cara"], "use": "official" }
+  ],
+
+  "address": [
+    { "@type": "Address", "line1": "12 Bad Lane", "city": "Nowhere", "postcode": "ZZZZZZ" }
+  ]
+}

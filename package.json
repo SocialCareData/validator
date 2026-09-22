@@ -1,0 +1,78 @@
+{
+  "name": "@socialcaredata/validator",
+  "version": "0.1.0",
+  "description": "Validate social care data against the published Social Care MAIS SHACL shapes, from the command line or the browser.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SocialCareData/validator.git"
+  },
+  "homepage": "https://socialcaredata.github.io/validator/",
+  "bugs": {
+    "url": "https://github.com/SocialCareData/validator/issues"
+  },
+  "keywords": [
+    "shacl",
+    "json-ld",
+    "rdf",
+    "validation",
+    "social-care",
+    "linkml"
+  ],
+  "bin": {
+    "scd-validate": "./dist/cli/main.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:web": "vite build --config web/vite.config.ts",
+    "dev:web": "vite --config web/vite.config.ts",
+    "preview": "vite preview --config web/vite.config.ts",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web/tsconfig.json",
+    "test": "vitest run --exclude '**/web.test.ts' --exclude '**/node_modules/**'",
+    "test:web": "vitest run test/web.test.ts",
+    "test:conformance": "vitest run test/conformance.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "jsonc-parser": "^3.3.1",
+    "jsonld": "^8.3.2",
+    "n3": "^1.17.4",
+    "picocolors": "^1.1.1",
+    "rdf-ext": "^2.5.1",
+    "rdf-validate-shacl": "^0.5.5"
+  },
+  "devDependencies": {
+    "@rdfjs/types": "^1.1.2",
+    "@types/node": "^22.10.0",
+    "playwright": "^1.55.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0",
+    "vitest": "^2.1.8"
+  }
+}

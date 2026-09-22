@@ -1,0 +1,59 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:INVALID-006",
+  "@type": "Placement",
+
+  "placementId": "PLC-INVALID-006",
+  "childId": "INVALID006",
+
+  "placementAvailability": {
+    "@id": "ex:INVALID-006/availability",
+    "@type": "PlacementAvailability",
+    "neededBy": "WithinFiveDays"
+  },
+
+  "placementRequirements": {
+    "@id": "ex:INVALID-006/requirements",
+    "@type": "PlacementRequirements",
+    "communicationNeeds": "Yes",
+    "specificCommunicationRequirement": ["Other"],
+    "culturalNeeds": "Other",
+    "livingCompanions": "NoPreference",
+    "pets": "YesCan",
+    "additionalSupport": "Other",
+    "homeAdaptationRequired": false
+  },
+
+  "placementRecommendation": {
+    "@id": "ex:INVALID-006/recommendation",
+    "@type": "PlacementRecommendation",
+    "fosterCareSuitability":             "NotSpecified",
+    "residentialCareSuitability":        "Preferred",
+    "supportedAccommodationSuitability": "NotSpecified"
+  },
+
+  "riskAssessment": {
+    "@id": "ex:INVALID-006/risk",
+    "@type": "RiskAssessment",
+    "riskSelfHarm":             "NoKnownRisk",
+    "riskCriminalExploitation": "NoKnownRisk",
+    "riskDrugAlcohol":          "NoKnownRisk",
+    "riskEatingDisorder":       "NoKnownRisk",
+    "riskMissing":              "NoKnownRisk",
+    "riskSexualExploitation":   "NoKnownRisk",
+    "riskToOthersPhysical":     "NoKnownRisk",
+    "riskToOthersSexual":       "NoKnownRisk",
+    "riskToOthersFire":         "NoKnownRisk",
+    "riskToOthersAnimals":      "NoKnownRisk",
+    "riskToOthersCriminal":     "NoKnownRisk"
+  },
+
+  "qualityAssurance": {
+    "@id": "ex:INVALID-006/qa",
+    "@type": "QualityAssurance",
+    "referralDate":  "2024-04-01",
+    "placementOfficerName": "Eli Rivera",
+    "placementDateAdmin": "2024-04-08",
+    "costDate":      "2024-04-12"
+  }
+}

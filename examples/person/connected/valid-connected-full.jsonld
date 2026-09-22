@@ -1,0 +1,44 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000003",
+  "@type": "Person",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "9100000003", "system": "https://fhir.nhs.uk/Id/nhs-number" }
+  ],
+
+  "name": [
+    { "@type": "Name", "familyName": ["Lopez"], "givenName": ["Ana"], "use": "official" }
+  ],
+
+  "dateOfBirth":  { "@type": "PartialDate", "date": "1962-07-09", "accuracyIndicator": "AAA" },
+  "isDeceased":   false,
+
+  "address": [
+    { "@type": "Address", "line1": "8 Riverside Walk", "city": "Anytown", "postcode": "AB1 2CD", "use": "home" }
+  ],
+
+  "contact": [
+    { "@type": "Contact", "name": "Home", "email": ["ana.lopez@example.org"], "telephone": ["+44 20 7946 0100"] }
+  ],
+
+  "genderCode":    "2",
+  "sexCode":       "2",
+  "ethnicityCode": "17",
+
+  "relatedPerson": [
+    {
+      "@type": "PersonRelationship",
+      "identifier": { "@type": "Identifier", "value": "9100099999", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+      "relationship": ["DAU"]
+    }
+  ],
+
+  "primaryContactProfessional": [
+    { "@type": "Identifier", "value": "GMC-9876543", "system": "https://example.org/Id/gmc-number" }
+  ],
+
+  "matchedPersonRef": [
+    { "@type": "Identifier", "value": "SC-LO-555", "system": "https://example.org/Id/social-care-local" }
+  ]
+}

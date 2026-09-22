@@ -1,0 +1,53 @@
+name: Publish to npm
+
+# Cutting a GitHub Release publishes the package. The tag must match the
+# version in package.json - a mismatch means the release notes describe
+# something other than what gets published, so it fails loudly instead.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Required for npm provenance: the registry verifies this workflow built the
+  # package, via a signed Sigstore attestation.
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+
+      - run: npm ci
+
+      - name: The tag and package.json must agree
+        if: github.event_name == 'release'
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$pkg" ]; then
+            echo "::error::release tag $tag does not match package.json version $pkg"
+            exit 1
+          fi
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - name: Publish
+        run: npm publish --provenance --access public
+        env:
+          # Prefer npm trusted publishing (configured on npmjs.com against this
+          # repository and workflow), which needs no secret at all. This token
+          # is the fallback for accounts that have not enabled it.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

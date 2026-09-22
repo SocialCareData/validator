@@ -1,0 +1,9 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000001",
+  "@type": "Person",
+
+  "name": [
+    { "@type": "Name", "familyName": ["Doe"], "givenName": ["Mary"], "use": "usual" }
+  ]
+}

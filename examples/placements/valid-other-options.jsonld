@@ -1,0 +1,77 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:OTHER-001",
+  "@type": "Placement",
+
+  "placementId": "PLC-OTHER-001",
+  "childId": "OTHER001",
+
+  "placementAvailability": {
+    "@id": "ex:OTHER-001/availability",
+    "@type": "PlacementAvailability",
+    "neededBy": "< 5 days",
+    "siblingCount": 0,
+    "uascStatus": "Yes"
+  },
+
+  "placementRequirements": {
+    "@id": "ex:OTHER-001/requirements",
+    "@type": "PlacementRequirements",
+    "communicationNeeds": "Yes",
+    "specificCommunicationRequirement":      ["BSL", "Other"],
+    "specificCommunicationRequirementOther": [
+      "AAC (augmentative and alternative communication) device required",
+      "Quiet, low-stimulation environment for verbal interaction"
+    ],
+    "culturalNeeds":      "Other",
+    "culturalNeedsOther": [
+      "Specific dietary observance during religious festivals",
+      "Access to community elder for weekly visits"
+    ],
+    "livingCompanions": "No preference",
+    "pets": "Yes-can",
+    "additionalSupport":      ["TaxisToSchool", "TherapeuticSupport", "Other"],
+    "additionalSupportOther": [
+      "On-site psychiatric nurse availability",
+      "Specialist transport for medical appointments"
+    ],
+    "homeAdaptationRequired": false,
+    "deprivationOfLiberty":   false,
+    "needsAssessmentMethod":  "Other social worker assessment"
+  },
+
+  "placementRecommendation": {
+    "@id": "ex:OTHER-001/recommendation",
+    "@type": "PlacementRecommendation",
+    "fosterCareSuitability":             "Not specified",
+    "residentialCareSuitability":        "Preferred",
+    "supportedAccommodationSuitability": "Not specified"
+  },
+
+  "riskAssessment": {
+    "@id": "ex:OTHER-001/risk",
+    "@type": "RiskAssessment",
+    "riskSelfHarm":             "No known risk",
+    "riskCriminalExploitation": "No known risk",
+    "riskDrugAlcohol":          "No known risk",
+    "riskEatingDisorder":       "No known risk",
+    "riskMissing":              "No known risk",
+    "riskSexualExploitation":   "No known risk",
+    "riskToOthersPhysical":     "Risk Present",
+    "riskToOthersSexual":       "No known risk",
+    "riskToOthersFire":         "No known risk",
+    "riskToOthersAnimals":      "No known risk",
+    "riskToOthersCriminal":     "No known risk"
+  },
+
+  "qualityAssurance": {
+    "@id": "ex:OTHER-001/qa",
+    "@type": "QualityAssurance",
+    "referralOfficerName": "Dana Khan",
+    "referralDate":        "2024-04-01",
+    "placementOfficerName":"Eli Rivera",
+    "placementDateAdmin":       "2024-04-08",
+    "costOfficerName":     "Frances Morgan",
+    "costDate":            "2024-04-12"
+  }
+}

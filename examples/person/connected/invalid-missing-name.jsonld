@@ -1,0 +1,11 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000004",
+  "@type": "Person",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "9100000004", "system": "https://fhir.nhs.uk/Id/nhs-number" }
+  ],
+
+  "dateOfBirth": { "@type": "PartialDate", "date": "1990-06-01", "accuracyIndicator": "AAA" }
+}

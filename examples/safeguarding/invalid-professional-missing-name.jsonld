@@ -1,0 +1,14 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:prf-no-name",
+  "@type": "Professional",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "SW1234567", "system": "https://example.org/Id/registration" }
+  ],
+  "role": ["Social Worker"],
+  "contact": {
+    "@type": "Contact",
+    "email": ["jane.doe@example.org"]
+  }
+}

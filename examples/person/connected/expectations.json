@@ -1,0 +1,38 @@
+{
+  "invalid-bad-gender.jsonld": [
+    {
+      "code": "value-not-allowed",
+      "jsonPath": "genderCode"
+    }
+  ],
+  "invalid-bad-postcode.jsonld": [
+    {
+      "code": "bad-format",
+      "jsonPath": "address[0].postcode"
+    }
+  ],
+  "invalid-missing-name.jsonld": [
+    {
+      "code": "required-field-missing",
+      "jsonPath": "name"
+    }
+  ],
+  "invalid-multiple-contacts.jsonld": [
+    {
+      "code": "too-many-values",
+      "jsonPath": "contact"
+    }
+  ],
+  "invalid-multiple-names.jsonld": [
+    {
+      "code": "too-many-values",
+      "jsonPath": "name"
+    }
+  ],
+  "invalid-multiple-relatedPersons.jsonld": [
+    {
+      "code": "too-many-values",
+      "jsonPath": "relatedPerson"
+    }
+  ]
+}

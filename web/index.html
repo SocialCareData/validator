@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Social Care Data Validator</title>
+    <meta name="description" content="Check social care records against the published Social Care MAIS SHACL shapes, in your browser." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>&#9989;</text></svg>" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="wrap">
+        <h1>Social Care Data Validator</h1>
+        <p class="lede">
+          Paste a record, choose the standard it should follow, and see what needs fixing.
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <form id="controls" class="controls" autocomplete="off">
+        <div class="field">
+          <label for="profile">Standard</label>
+          <select id="profile" name="profile"></select>
+          <p class="help" id="profile-help"></p>
+        </div>
+        <div class="actions">
+          <button type="submit" id="validate" class="primary">Validate</button>
+          <button type="button" id="clear" class="ghost">Clear</button>
+        </div>
+      </form>
+
+      <details class="advanced">
+        <summary>Advanced</summary>
+        <div class="advanced-body">
+          <label for="ref">Ontology version (git ref)</label>
+          <input id="ref" name="ref" spellcheck="false" />
+          <p class="help">
+            Which revision of
+            <a href="https://github.com/SocialCareData/ontology" rel="noreferrer">SocialCareData/ontology</a>
+            the shapes are read from. A tag pins results; a branch tracks the latest.
+          </p>
+        </div>
+      </details>
+
+      <section class="editor-section">
+        <div class="editor-head">
+          <h2>Your data</h2>
+          <div class="sample">
+            <label for="example" class="visually-hidden">Load an example</label>
+            <select id="example">
+              <option value="">Load an example…</option>
+            </select>
+          </div>
+        </div>
+        <div class="editor" id="editor">
+          <pre class="gutter" id="gutter" aria-hidden="true"></pre>
+          <textarea
+            id="input"
+            spellcheck="false"
+            aria-label="JSON or JSON-LD to validate"
+            placeholder='{&#10;  "@type": "Person",&#10;  "name": [{ "@type": "Name", "givenName": ["Ada"], "familyName": "Lovelace" }]&#10;}'
+          ></textarea>
+        </div>
+        <p class="privacy">
+          Your data stays in this browser. Only the shape and context files are downloaded.
+        </p>
+      </section>
+
+      <section id="results" class="results" aria-live="polite"></section>
+    </main>
+
+    <footer class="wrap footer">
+      <p>
+        <a href="https://github.com/SocialCareData/validator" rel="noreferrer">Source and command-line tool</a>
+        · <a href="https://github.com/SocialCareData/validator/blob/main/docs/error-reference.md" rel="noreferrer">What the messages mean</a>
+        · <a href="https://standard.socialcaredata.io" rel="noreferrer">The standards</a>
+      </p>
+    </footer>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

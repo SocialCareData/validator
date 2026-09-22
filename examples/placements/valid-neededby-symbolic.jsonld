@@ -1,0 +1,61 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:NEEDEDBY-001",
+  "@type": "Placement",
+
+  "placementId": "PLC-NEEDEDBY-001",
+  "childId": "NEEDEDBY001",
+
+  "placementAvailability": {
+    "@id": "ex:NEEDEDBY-001/availability",
+    "@type": "PlacementAvailability",
+    "neededBy": "> 5 days",
+    "uascStatus": "NotApplicable"
+  },
+
+  "placementRequirements": {
+    "@id": "ex:NEEDEDBY-001/requirements",
+    "@type": "PlacementRequirements",
+    "communicationNeeds": "No",
+    "specificCommunicationRequirement": ["None"],
+    "culturalNeeds": "NotRequired",
+    "livingCompanions": "NoPreference",
+    "pets": "YesCan",
+    "homeAdaptationRequired": false,
+    "deprivationOfLiberty": false,
+    "needsAssessmentMethod": "OtherFormalisedTool"
+  },
+
+  "placementRecommendation": {
+    "@id": "ex:NEEDEDBY-001/recommendation",
+    "@type": "PlacementRecommendation",
+    "fosterCareSuitability": "Preferred",
+    "residentialCareSuitability": "NotSpecified",
+    "supportedAccommodationSuitability": "NotSpecified"
+  },
+
+  "riskAssessment": {
+    "@id": "ex:NEEDEDBY-001/risk",
+    "@type": "RiskAssessment",
+    "riskSelfHarm":             "NoKnownRisk",
+    "riskCriminalExploitation": "NoKnownRisk",
+    "riskDrugAlcohol":          "NoKnownRisk",
+    "riskEatingDisorder":       "NoKnownRisk",
+    "riskMissing":              "NoKnownRisk",
+    "riskSexualExploitation":   "NoKnownRisk",
+    "riskToOthersPhysical":     "NoKnownRisk",
+    "riskToOthersSexual":       "NoKnownRisk",
+    "riskToOthersFire":         "NoKnownRisk",
+    "riskToOthersAnimals":      "NoKnownRisk",
+    "riskToOthersCriminal":     "NoKnownRisk"
+  },
+
+  "qualityAssurance": {
+    "@id": "ex:NEEDEDBY-001/qa",
+    "@type": "QualityAssurance",
+    "referralDate": "2024-05-01",
+    "placementOfficerName": "Jordan Lee",
+    "placementDateAdmin": "2024-05-05",
+    "costDate": "2024-05-07"
+  }
+}

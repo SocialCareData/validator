@@ -1,0 +1,26 @@
+{
+  "@context": "../../context.jsonld",
+  "@id": "ex:person-connected-9100000007",
+  "@type": "Person",
+
+  "identifier": [
+    { "@type": "Identifier", "value": "9100000007", "system": "https://fhir.nhs.uk/Id/nhs-number" }
+  ],
+
+  "name": [
+    { "@type": "Name", "familyName": ["Green"], "givenName": ["Lee"], "use": "official" }
+  ],
+
+  "relatedPerson": [
+    {
+      "@type": "PersonRelationship",
+      "identifier": { "@type": "Identifier", "value": "9100099998", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+      "relationship": ["SIB"]
+    },
+    {
+      "@type": "PersonRelationship",
+      "identifier": { "@type": "Identifier", "value": "9100099997", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+      "relationship": ["FRND"]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # The conformance suite runs against the ontology repo's `main`, which moves
+  # independently of this repo. A nightly run catches upstream drift before a
+  # user does, and is what replaces the publish gate that used to live in
+  # SocialCareData/standard.
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      # Shapes are fetched from raw.githubusercontent.com. Caching them keeps
+      # the suite fast and survives brief upstream outages.
+      - name: Restore shape cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/shapes
+          key: shapes-${{ hashFiles('src/catalogue/entries.ts') }}-${{ github.run_id }}
+          restore-keys: shapes-${{ hashFiles('src/catalogue/entries.ts') }}-
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run build:web
+
+      - name: Install a browser for the page tests
+        run: npx playwright install --with-deps chromium
+
+      - run: npm run test:web
+
+  # A published package that cannot be installed is worse than no package.
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install the tarball somewhere else and run it
+        run: |
+          tarball="$(npm pack --silent)"
+          mkdir -p "$RUNNER_TEMP/smoke"
+          cd "$RUNNER_TEMP/smoke"
+          npm init -y >/dev/null
+          npm install "$GITHUB_WORKSPACE/$tarball"
+          ./node_modules/.bin/scd-validate profiles
+          ./node_modules/.bin/scd-validate explain required-field-missing

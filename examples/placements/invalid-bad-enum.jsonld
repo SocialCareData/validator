@@ -1,0 +1,58 @@
+{
+  "@context": "../context.jsonld",
+  "@id": "ex:INVALID-002",
+  "@type": "Placement",
+
+  "childId": "INVALID002",
+
+  "placementAvailability": {
+    "@id": "ex:INVALID-002/availability",
+    "@type": "PlacementAvailability",
+    "placementId": "PLC-INVALID-002",
+    "neededBy": "Today"
+  },
+
+  "placementRequirements": {
+    "@id": "ex:INVALID-002/requirements",
+    "@type": "PlacementRequirements",
+    "communicationNeeds": "NotSpecified",
+    "specificCommunicationRequirement": ["XYZ"],
+    "culturalNeeds": "NotRequired",
+    "livingCompanions": "NoPreference",
+    "pets": "MaybePets",
+    "homeAdaptationRequired": false
+  },
+
+  "placementRecommendation": {
+    "@id": "ex:INVALID-002/recommendation",
+    "@type": "PlacementRecommendation",
+    "fosterCareSuitability": "Preferred",
+    "residentialCareSuitability": "NotSpecified",
+    "supportedAccommodationSuitability": "NotSpecified"
+  },
+
+  "riskAssessment": {
+    "@id": "ex:INVALID-002/risk",
+    "@type": "RiskAssessment",
+    "riskSelfHarm":             "Severe",
+    "riskCriminalExploitation": "NoKnownRisk",
+    "riskDrugAlcohol":          "NoKnownRisk",
+    "riskEatingDisorder":       "NoKnownRisk",
+    "riskMissing":              "NoKnownRisk",
+    "riskSexualExploitation":   "NoKnownRisk",
+    "riskToOthersPhysical":     "NoKnownRisk",
+    "riskToOthersSexual":       "NoKnownRisk",
+    "riskToOthersFire":         "NoKnownRisk",
+    "riskToOthersAnimals":      "NoKnownRisk",
+    "riskToOthersCriminal":     "NoKnownRisk"
+  },
+
+  "qualityAssurance": {
+    "@id": "ex:INVALID-002/qa",
+    "@type": "QualityAssurance",
+    "referralDate":  "2024-02-12",
+    "placementOfficerName": "Beth Green",
+    "placementDateAdmin": "2024-03-21",
+    "costDate":      "2024-03-25"
+  }
+}

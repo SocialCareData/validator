@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+    "types": ["vite/client"],
+    "noEmit": true,
+    "rootDir": "..",
+    "paths": { "@validator/*": ["../src/*"] }
+  },
+  "include": ["src/**/*.ts", "vite.config.ts", "../src/**/*.ts"]
+}
