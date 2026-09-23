@@ -257,6 +257,23 @@ function renderReport (report: RunReport): void {
 
 const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' })
 let requestId = 0
+// A worker that throws while loading is gone for good, and messages posted to
+// it vanish without a reply - which on the page looks like "Validating..."
+// forever. Remember the failure so every run can say so instead.
+let workerFailure: string | undefined
+
+function showWorkerFailure (): void {
+  validateButton.disabled = false
+  validateButton.textContent = 'Validate'
+  results.replaceChildren(banner('error',
+    `The validator could not start in this browser: ${workerFailure ?? 'unknown error'}`))
+}
+
+// Deliberately not preventDefault(): the error should still reach the console.
+worker.addEventListener('error', (event: ErrorEvent) => {
+  workerFailure = event.message !== '' ? event.message : 'the worker script failed to load'
+  showWorkerFailure()
+})
 
 worker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
   const message = event.data
@@ -275,6 +292,7 @@ worker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
 })
 
 function run (): void {
+  if (workerFailure !== undefined) { showWorkerFailure(); return }
   const text = input.value.trim()
   if (text === '') {
     results.replaceChildren(banner('info', 'Paste a record above, or load one of the examples.'))

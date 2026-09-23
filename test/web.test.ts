@@ -5,30 +5,36 @@
  * cannot - that the RDF stack survives bundling, that the worker starts, that
  * shapes fetch across origins from GitHub Pages, and that a person who pastes a
  * broken record sees the field name and the line.
+ *
+ * It drives the production build, not the dev server. The two differ in ways
+ * that matter: the dev server never tree-shakes, so it once hid a build that
+ * dropped the worker's `window` shim and hung on "Validating..." in production.
  */
 
 import { describe, expect, test, beforeAll, afterAll } from 'vitest'
 import { chromium, type Browser, type Page } from 'playwright'
-import { createServer, type ViteDevServer } from 'vite'
-import { readFileSync } from 'node:fs'
+import { build, preview, type PreviewServer } from 'vite'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-let server: ViteDevServer
+let server: PreviewServer
+let outDir: string
 let browser: Browser
 let page: Page
 let baseUrl: string
 const consoleErrors: string[] = []
 
 beforeAll(async () => {
-  server = await createServer({
-    configFile: join(root, 'web', 'vite.config.ts'),
-    server: { port: 0 },
-  })
-  await server.listen()
-  const address = server.httpServer?.address()
+  const configFile = join(root, 'web', 'vite.config.ts')
+  // A scratch directory, so a test run never overwrites web/dist.
+  outDir = mkdtempSync(join(tmpdir(), 'scd-validator-web-'))
+  await build({ configFile, logLevel: 'warn', build: { outDir } })
+  server = await preview({ configFile, build: { outDir }, preview: { port: 0 } })
+  const address = server.httpServer.address()
   const port = typeof address === 'object' && address !== null ? address.port : 0
   baseUrl = `http://localhost:${port}${server.config.base}`
 
@@ -49,6 +55,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await browser?.close()
   await server?.close()
+  if (outDir !== undefined) rmSync(outDir, { recursive: true, force: true })
 })
 
 describe('the validator page', () => {

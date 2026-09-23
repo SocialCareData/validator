@@ -38,7 +38,9 @@
     "README.md",
     "LICENSE"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./web/src/worker-globals.ts"
+  ],
   "publishConfig": {
     "access": "public",
     "provenance": true
