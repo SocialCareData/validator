@@ -3,8 +3,10 @@
  * renders the report, and keeps the gutter in step with the textarea.
  */
 
-import { catalogue, DEFAULT_REF } from '@validator/catalogue/entries.js'
-import type { Issue, RunReport, Severity } from '@validator/report/types.js'
+import { profiles, getProfile, DEFAULT_REF } from '@validator/catalogue.js'
+import { groupIssues } from '@validator/report.js'
+import type { Issue, RunReport, Severity } from '@validator/report.js'
+import { DESCRIPTIONS } from './descriptions.js'
 import type { ValidateRequest, WorkerResponse } from './worker.js'
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -35,8 +37,8 @@ const STORAGE_KEY = 'scd-validator:last'
 // Setup
 // ---------------------------------------------------------------------------
 
-for (const entry of catalogue) {
-  profileSelect.add(new Option(entry.label, entry.id))
+for (const profile of profiles) {
+  profileSelect.add(new Option(profile.label, profile.id))
 }
 refInput.value = DEFAULT_REF
 
@@ -45,12 +47,12 @@ function exampleKey (path: string): string {
 }
 
 function refreshExamples (): void {
-  const entry = catalogue.find((e) => e.id === profileSelect.value)
-  profileHelp.textContent = entry?.describes ?? ''
+  const profile = getProfile(profileSelect.value)
+  profileHelp.textContent = DESCRIPTIONS[profileSelect.value] ?? ''
 
   exampleSelect.length = 1
-  if (!entry) return
-  const prefix = `${entry.examples.replace(/^examples\//, '')}/`
+  if (!profile) return
+  const prefix = `${profile.examples.replace(/^examples\//, '')}/`
   for (const path of Object.keys(exampleFiles).sort()) {
     const key = exampleKey(path)
     if (!key.startsWith(prefix)) continue
@@ -148,9 +150,9 @@ function issueCard (issue: Issue): HTMLElement {
     card.append(hint)
   }
 
-  if (issue.expected?.kind === 'one-of' && issue.expected.values.length > 0) {
+  if (issue.allowedValues !== undefined && issue.allowedValues.length > 0) {
     const pills = el('div', 'pills')
-    for (const value of issue.expected.values) pills.append(el('span', 'pill', value))
+    for (const value of issue.allowedValues) pills.append(el('span', 'pill', value))
     card.append(pills)
   }
 
@@ -160,7 +162,7 @@ function issueCard (issue: Issue): HTMLElement {
     const dl = document.createElement('dl')
     const rows: [string, string | undefined][] = [
       ['code', issue.code],
-      ['constraint', issue.technical.sourceConstraintComponent.split('#').pop()],
+      ['constraint', issue.technical.constraint],
       ['property', issue.technical.resultPath],
       ['focus', issue.technical.focusNode],
       ['shape', issue.technical.sourceShape],
@@ -218,15 +220,10 @@ function renderReport (report: RunReport): void {
   }
   renderGutter()
 
-  const byId = new Map(doc.issues.map((i) => [i.id, i]))
-  for (const group of doc.groups) {
-    const issues = group.issues
-      .map((id) => byId.get(id))
-      .filter((i): i is Issue => i !== undefined && i.severity !== 'info')
-    if (issues.length === 0) continue
+  for (const group of groupIssues(doc.issues.filter((i) => i.severity !== 'info'))) {
     const section = el('section', 'group')
     section.append(el('h3', undefined, group.label))
-    for (const issue of issues) section.append(issueCard(issue))
+    for (const issue of group.issues) section.append(issueCard(issue))
     results.append(section)
   }
 

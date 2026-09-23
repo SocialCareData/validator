@@ -22,7 +22,7 @@
  * it and turns skolemization off if one ever appears.
  */
 
-import { SourceMap } from './source-map.js'
+import { parseTree, findNodeAtLocation, type Node as JsoncNode } from 'jsonc-parser'
 import type { ContextIndex } from './context.js'
 
 export const SKOLEM_PREFIX = 'urn:scd:node:'
@@ -35,13 +35,11 @@ export interface NodeLocation {
   /** `@type` as written in the document, e.g. `Address`. */
   nodeType?: string
   /** Nearest `@id` on this node or an ancestor - the user's own handle on it. */
-  nearestId?: string
+  nodeId?: string
   line?: number
   column?: number
   endLine?: number
   endColumn?: number
-  offset?: number
-  length?: number
 }
 
 export interface SkolemizeResult {
@@ -97,7 +95,7 @@ export function skolemize (input: unknown, opts: SkolemizeOptions = {}): Skolemi
     jsonPath: string
     pointer: string
     segments: (string | number)[]
-    nearestId?: string
+    nodeId?: string
     /** Class IRI of the enclosing node, for type-scoped term lookups. */
     typeIri?: string
     /** Term definition of the key that led here. */
@@ -162,7 +160,7 @@ export function skolemize (input: unknown, opts: SkolemizeOptions = {}): Skolemi
       ? opts.context.expand(typeName)
       : undefined
 
-    const nearestId = declaredId ?? frame.nearestId
+    const nodeId = declaredId ?? frame.nodeId
 
     const loc: NodeLocation = {
       jsonPath: frame.jsonPath === '' ? '$' : frame.jsonPath,
@@ -170,7 +168,7 @@ export function skolemize (input: unknown, opts: SkolemizeOptions = {}): Skolemi
       ...locate(frame.segments),
     }
     if (typeName !== undefined) loc.nodeType = typeName
-    if (nearestId !== undefined) loc.nearestId = nearestId
+    if (nodeId !== undefined) loc.nodeId = nodeId
     record(iri, loc)
     // Index the expanded form too, so a report quoting the absolute IRI still
     // finds the node when the document wrote it compactly (`ex:person-1`).
@@ -188,7 +186,7 @@ export function skolemize (input: unknown, opts: SkolemizeOptions = {}): Skolemi
         segments: [...frame.segments, key],
         containers: def?.container ?? [],
       }
-      if (nearestId !== undefined) childFrame.nearestId = nearestId
+      if (nodeId !== undefined) childFrame.nodeId = nodeId
       if (typeIri !== undefined) childFrame.typeIri = typeIri
       out[key] = walk(child, childFrame)
     }
@@ -206,4 +204,64 @@ export function skolemize (input: unknown, opts: SkolemizeOptions = {}): Skolemi
 
 export function isSkolemIri (iri: string): boolean {
   return iri.startsWith(SKOLEM_PREFIX)
+}
+
+export interface SourceSpan {
+  line: number
+  column: number
+  endLine: number
+  endColumn: number
+}
+
+function decodeSegment (segment: string): string {
+  return segment.replace(/~1/g, '/').replace(/~0/g, '~')
+}
+
+export class SourceMap {
+  private readonly tree: JsoncNode | undefined
+  private readonly lineStarts: number[]
+
+  constructor (text: string) {
+    this.tree = parseTree(text)
+    this.lineStarts = [0]
+    for (let i = 0; i < text.length; i++) {
+      if (text.charCodeAt(i) === 10) this.lineStarts.push(i + 1)
+    }
+  }
+
+  private lineCol (offset: number): { line: number, column: number } {
+    let lo = 0
+    let hi = this.lineStarts.length - 1
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1
+      if (this.lineStarts[mid]! <= offset) lo = mid
+      else hi = mid - 1
+    }
+    return { line: lo + 1, column: offset - this.lineStarts[lo]! + 1 }
+  }
+
+  /** Locate by pre-split path segments (what the walker already has). */
+  locateSegments (segments: (string | number)[]): SourceSpan | undefined {
+    if (!this.tree) return undefined
+    const node = findNodeAtLocation(this.tree, segments)
+    if (!node) return undefined
+    const start = this.lineCol(node.offset)
+    const end = this.lineCol(node.offset + node.length)
+    return {
+      line: start.line,
+      column: start.column,
+      endLine: end.line,
+      endColumn: end.column,
+    }
+  }
+
+  /** Locate by RFC 6901 pointer, e.g. `/address/0/postcode`. */
+  locate (pointer: string): SourceSpan | undefined {
+    if (pointer === '') return this.locateSegments([])
+    const segments = pointer.split('/').slice(1).map((raw) => {
+      const decoded = decodeSegment(raw)
+      return /^\d+$/.test(decoded) ? Number(decoded) : decoded
+    })
+    return this.locateSegments(segments)
+  }
 }

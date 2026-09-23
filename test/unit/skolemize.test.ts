@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import { skolemize, SKOLEM_PREFIX } from '../../src/core/skolemize.js'
-import { ContextIndex } from '../../src/core/context.js'
+import { skolemize, SKOLEM_PREFIX } from '../../src/skolemize.js'
+import { ContextIndex } from '../../src/context.js'
 
 const ctx = new ContextIndex({
   p: 'https://ontology.socialcaredata.io/',
@@ -36,7 +36,7 @@ describe('skolemize', () => {
     expect(loc?.jsonPath).toBe('address[0]')
     expect(loc?.pointer).toBe('/address/0')
     expect(loc?.nodeType).toBe('Address')
-    expect(loc?.nearestId).toBe('ex:person-1')
+    expect(loc?.nodeId).toBe('ex:person-1')
   })
 
   test('leaves an existing @id alone and indexes it', () => {

@@ -19,8 +19,6 @@ build rather than passing quietly.
 
 ```bash
 npm run test:conformance
-# or, with the CLI:
-scd-validate -p placements --expect auto examples/placements/*.jsonld
 ```
 
 Each file declares a relative `@context` inherited from its original home. That

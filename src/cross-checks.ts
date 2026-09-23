@@ -5,12 +5,10 @@
 
 import { rdf } from './rdf.js'
 import type { Dataset } from 'rdf-ext'
-import type { NodeLocation } from './skolemize.js'
 
 export interface CrossCheckDocument {
   name: string
   dataset: Dataset
-  index: Map<string, NodeLocation[]>
 }
 
 export interface CrossCheckFinding {

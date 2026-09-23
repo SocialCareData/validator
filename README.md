@@ -21,9 +21,8 @@ mydata.jsonld -> fails
       It should be a UK postcode in upper case, with an optional space, for example `AB1 2CD`.
   i No @context in this document, so the selected profile's context was used
 
-1 problem, 1 note
+1 problem
   1 bad format
-  Run `scd-validate explain <code>` for what any of these mean.
 ```
 
 The point of this tool is that last part. A conformant SHACL engine will tell you
@@ -40,7 +39,11 @@ npm install --global @socialcaredata/validator   # or use npx, as above
 
 Node 20.19 or newer.
 
-## Standards it knows about
+## Usage
+
+```
+scd-validate [files...] -p <profile> [--ref <ref>] [--json]
+```
 
 | Profile | Covers |
 | --- | --- |
@@ -50,8 +53,8 @@ Node 20.19 or newer.
 | `safeguarding` | Organisations, services, professionals, service episodes |
 | `assessments-and-plans` | Care needs assessments and care plans |
 
-`scd-validate profiles` lists them with descriptions and the exact files each one
-loads.
+With no files, or `-`, it reads stdin. Exit codes: `0` clean, `1` problems found,
+`2` bad usage, `3` shapes could not be loaded. See [the CLI reference](docs/cli.md).
 
 ## Where the shapes come from
 
@@ -60,7 +63,7 @@ LinkML schemas in
 [SocialCareData/standard](https://github.com/SocialCareData/standard) and
 published to [SocialCareData/ontology](https://github.com/SocialCareData/ontology);
 this tool fetches them at run time. So you are always checking against the
-published standard, and never against a stale copy baked into a release.
+published standard, never a stale copy baked into a release.
 
 The revision is controlled by `--ref`, which defaults to `main`:
 
@@ -69,38 +72,26 @@ scd-validate -p placements --ref main       record.jsonld   # latest
 scd-validate -p placements --ref v2026.1.0  record.jsonld   # pinned (once tagged)
 ```
 
-Fetched files are cached on disk, so repeat runs are fast. `scd-validate fetch`
-warms that cache and `--offline` then works without a network.
-
-To validate against shapes of your own, skip the catalogue entirely:
-
-```bash
-scd-validate -s ./my-shape.ttl -c ./my-context.jsonld record.jsonld
-```
-
 ## In CI
 
 ```yaml
 - run: npx @socialcaredata/validator -p placements 'data/**/*.jsonld'
 ```
 
-Under GitHub Actions the output format defaults to workflow commands, so problems
-appear as inline annotations on the pull request. `--format sarif` uploads to code
-scanning instead. Exit codes: `0` clean, `1` problems found, `2` bad usage, `3`
-shapes could not be loaded.
+A non-zero exit fails the step; add `--json` for structured output.
 
 ## As a library
 
 ```ts
-import { validate, render } from '@socialcaredata/validator'
+import { validate, renderPretty } from '@socialcaredata/validator'
 
 const report = await validate(myRecord, 'person:subject-of-care')
-console.log(render(report, 'pretty'))
+console.log(renderPretty(report, { color: false }))
 ```
 
-The core is isomorphic — no `node:fs` on the validation path — so the same build
-runs in Node, in a bundler and in the browser. Node-only helpers (reading files,
-stdin, the disk cache) live in `@socialcaredata/validator/node`.
+The package is isomorphic — nothing in it touches the filesystem — so the same
+build runs in Node, in a bundler and in the browser. See [the API
+reference](docs/api.md).
 
 ## Documentation
 

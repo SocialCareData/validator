@@ -13,8 +13,8 @@ their fields, plus any checks that span a whole set of records.
 
 Each also loads `<module>/context.jsonld` from the same place.
 
-`scd-validate profiles --check` confirms every one of those URLs resolves at the
-ref you are using.
+`scd-validate --help` lists them; `--json` on a run reports the exact URLs that
+were loaded.
 
 ## Why Person has two profiles
 
@@ -46,8 +46,8 @@ to a tag:
 scd-validate -p placements --ref v2026.1.0 data/*.jsonld
 ```
 
-Cached files for a tag or a full commit SHA are kept indefinitely, because they
-cannot change. A branch is revalidated after ten minutes.
+Shapes are fetched fresh on each run - two or three small files - and held in
+memory for the life of the process.
 
 ## The placements rules shape
 
@@ -61,7 +61,6 @@ than failing. The rest of the checks are unaffected.
 
 ## Adding a profile
 
-Add an entry to `src/catalogue/entries.ts`, put its examples under
-`examples/<name>/` following the `valid-*` / `invalid-*` convention, and the
-conformance suite will pick them up automatically. See
-[contributing](contributing.md).
+Add an entry to `src/catalogue.ts`, put its examples under `examples/<name>/`
+following the `valid-*` / `invalid-*` convention, and the conformance suite will
+pick them up automatically. See [contributing](contributing.md).

@@ -1,0 +1,345 @@
+/*
+ * What a report is, and how a raw SHACL result becomes one.
+ *
+ * The three translations that matter, in order of how much they help:
+ *   focus node   -> a JSON path, via the skolemization index
+ *   property IRI -> the term the user wrote, via the inverted context
+ *   constraint   -> a sentence, via the shape's own facts
+ *
+ * Every issue has two layers: the human one (title, hint, jsonPath, allowed
+ * values) which never contains a raw IRI, and `technical`, which is the escape
+ * hatch for people who know SHACL and what makes bug reports actionable.
+ */
+
+import { describeConstraint } from './messages.js'
+import { shapeFacts } from './shape-facts.js'
+import { isSkolemIri, type NodeLocation, type SourceMap } from './skolemize.js'
+import type { ContextIndex } from './context.js'
+import type { Dataset } from 'rdf-ext'
+import type { ValidationResult } from 'rdf-validate-shacl'
+
+export type Severity = 'violation' | 'warning' | 'info'
+
+export type IssueCode =
+  | 'required-field-missing'
+  | 'too-few-values'
+  | 'too-many-values'
+  | 'value-not-allowed'
+  | 'bad-format'
+  | 'wrong-type'
+  | 'wrong-object-type'
+  | 'out-of-range'
+  | 'rule-violation'
+  | 'duplicate-child-id'
+  | 'assumed-context'
+  | 'substituted-context'
+  | 'parse-error'
+  | 'shape-unavailable'
+  | 'other'
+
+export interface Location {
+  /** `address[0].postcode`, or `$` for the document root. */
+  jsonPath: string
+  /** RFC 6901 pointer for the same place. */
+  pointer: string
+  /** `@type` as written, e.g. `Address`. */
+  nodeType?: string
+  /** Nearest `@id` the user wrote, on this node or an ancestor. */
+  nodeId?: string
+  line?: number
+  column?: number
+  endLine?: number
+  endColumn?: number
+  /** File name, when several documents are validated together. */
+  document?: string
+}
+
+export interface Issue {
+  severity: Severity
+  code: IssueCode
+  /** One line, plain English, never an IRI. */
+  title: string
+  /** What to do about it. */
+  hint?: string
+  location: Location
+  /** The field this is about, as the user writes it. */
+  field?: { term: string, iri: string }
+  /** The offending value, as the user wrote it where we can see it. */
+  value?: string
+  /** Permitted values for a controlled vocabulary, as tokens. */
+  allowedValues?: string[]
+  technical?: {
+    focusNode: string
+    resultPath?: string
+    sourceShape?: string
+    constraint: string
+  }
+}
+
+export interface DocumentReport {
+  document: string
+  conforms: boolean
+  counts: Record<Severity, number>
+  issues: Issue[]
+}
+
+export interface CrossCheckReport {
+  id: string
+  title: string
+  ok: boolean
+  findings: { message: string, documents: string[] }[]
+}
+
+export interface RunReport {
+  profile: {
+    id: string
+    label: string
+    ref: string
+    shapes: string[]
+    context?: string
+    /** Anything odd about the setup, e.g. a shape that is not published. */
+    warnings: Issue[]
+  }
+  documents: DocumentReport[]
+  crossChecks: CrossCheckReport[]
+  conforms: boolean
+  counts: Record<Severity, number>
+}
+
+export function emptyCounts (): Record<Severity, number> {
+  return { violation: 0, warning: 0, info: 0 }
+}
+
+export function noteIssue (code: IssueCode, title: string, hint?: string): Issue {
+  return {
+    severity: code === 'shape-unavailable' ? 'warning' : 'info',
+    code,
+    title,
+    ...(hint !== undefined ? { hint } : {}),
+    location: { jsonPath: '$', pointer: '' },
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Building
+// ---------------------------------------------------------------------------
+
+export interface BuildContext {
+  document: string
+  shapes: Dataset
+  index: Map<string, NodeLocation[]>
+  context?: ContextIndex
+  /** The parsed document, for quoting the offending value back. */
+  data: unknown
+  /** Locates the *property* in the source text, not just its parent node. */
+  sourceMap?: SourceMap
+}
+
+function severityOf (result: ValidationResult): Severity {
+  const value = result.severity?.value ?? ''
+  if (value.endsWith('Warning')) return 'warning'
+  if (value.endsWith('Info')) return 'info'
+  return 'violation'
+}
+
+function escapeSegment (segment: string): string {
+  return segment.replace(/~/g, '~0').replace(/\//g, '~1')
+}
+
+function resolvePointer (data: unknown, pointer: string): unknown {
+  if (pointer === '') return data
+  let current: unknown = data
+  for (const raw of pointer.split('/').slice(1)) {
+    const key = raw.replace(/~1/g, '/').replace(/~0/g, '~')
+    if (Array.isArray(current)) current = current[Number(key)]
+    else if (current !== null && typeof current === 'object') current = (current as Record<string, unknown>)[key]
+    else return undefined
+    if (current === undefined) return undefined
+  }
+  return current
+}
+
+/** The value as the user wrote it, when it is a scalar we can point at. */
+function writtenValue (data: unknown, pointer: string): string | undefined {
+  const value = resolvePointer(data, pointer)
+  // `"x": ["XYZ"]` reads as XYZ to whoever wrote it; only collapse a single
+  // entry, so we never hide that there were several.
+  const scalar = Array.isArray(value) && value.length === 1 ? value[0] : value
+  if (typeof scalar === 'string' || typeof scalar === 'number' || typeof scalar === 'boolean') {
+    return String(scalar)
+  }
+  return undefined
+}
+
+/** An IRI value shown as the token or term a user would recognise. */
+function displayIri (
+  raw: string | undefined, ctx: ContextIndex | undefined,
+  propertyIri: string | undefined, typeIri: string | undefined,
+): string | undefined {
+  if (raw === undefined) return undefined
+  if (ctx && /^https?:\/\//.test(raw)) {
+    return (propertyIri !== undefined ? ctx.tokenFor(raw, propertyIri, typeIri) : undefined)
+      ?? ctx.termFor(raw, typeIri)
+      ?? ctx.compact(raw)
+  }
+  return raw
+}
+
+export function buildIssues (results: ValidationResult[], build: BuildContext): Issue[] {
+  const issues: Issue[] = []
+
+  for (const result of results) {
+    const focus = result.focusNode?.value
+    const primary = focus !== undefined ? build.index.get(focus)?.[0] : undefined
+
+    const propertyIri = result.path?.value
+    const typeIri = primary?.nodeType !== undefined && build.context
+      ? build.context.expand(primary.nodeType)
+      : undefined
+    const term = propertyIri !== undefined && build.context
+      ? build.context.termFor(propertyIri, typeIri)
+      : undefined
+
+    const facts = shapeFacts(build.shapes, result.sourceShape)
+    const constraint = result.sourceConstraintComponent?.value.split('#').pop() ?? 'Unknown'
+
+    // Permitted values, rendered as the tokens a user would type.
+    let allowedValues: string[] | undefined
+    if (facts.in) {
+      const tokens = propertyIri !== undefined
+        ? build.context?.tokensFor(propertyIri, typeIri)
+        : undefined
+      allowedValues = facts.in.map((iri) =>
+        tokens?.get(iri) ?? build.context?.termFor(iri, typeIri) ?? build.context?.compact(iri) ?? iri)
+    }
+
+    const base: Location = primary
+      ? { ...primary, document: build.document }
+      : { jsonPath: '$', pointer: '', document: build.document }
+
+    // The issue belongs at the property, one level below the focus node.
+    let location = base
+    let value = displayIri(result.value?.value, build.context, propertyIri, typeIri)
+    if (term !== undefined && primary) {
+      const pointer = `${base.pointer}/${escapeSegment(term)}`
+      // The property's own span is what should be underlined. When it is absent
+      // there is nothing to point at, so the enclosing node's span stands.
+      const span = build.sourceMap?.locate(pointer)
+      location = {
+        ...base,
+        jsonPath: base.jsonPath === '$' ? term : `${base.jsonPath}.${term}`,
+        pointer,
+        ...(span ?? {}),
+      }
+      value = writtenValue(build.data, pointer) ?? value
+    }
+
+    const message = describeConstraint({
+      constraint,
+      term,
+      facts,
+      value,
+      ...(allowedValues !== undefined ? { allowedValues } : {}),
+    })
+
+    issues.push({
+      severity: severityOf(result),
+      code: message.code,
+      title: message.title,
+      ...(message.hint !== undefined ? { hint: message.hint } : {}),
+      location,
+      ...(term !== undefined && propertyIri !== undefined ? { field: { term, iri: propertyIri } } : {}),
+      ...(value !== undefined ? { value } : {}),
+      ...(allowedValues !== undefined ? { allowedValues } : {}),
+      technical: {
+        // A synthetic identifier means nothing outside this process, so report
+        // the node the way a reader can actually find it.
+        focusNode: focus === undefined
+          ? '(none)'
+          : isSkolemIri(focus)
+            ? `(anonymous node at ${base.jsonPath}${
+                primary?.nodeId !== undefined ? `, within ${primary.nodeId}` : ''})`
+            : focus,
+        ...(propertyIri !== undefined ? { resultPath: propertyIri } : {}),
+        ...(result.sourceShape ? { sourceShape: result.sourceShape.value } : {}),
+        constraint,
+      },
+    })
+  }
+
+  return dedupe(issues)
+}
+
+/**
+ * One mistake often trips several constraints at once - an out-of-vocabulary
+ * value fails `sh:in` and `sh:class` together. Showing both trains people to
+ * ignore the output, so the specific complaint wins.
+ */
+function dedupe (issues: Issue[]): Issue[] {
+  const slots = new Map<string, Issue[]>()
+  for (const issue of issues) {
+    const slot = `${issue.location.pointer}|${issue.value ?? ''}`
+    const bucket = slots.get(slot)
+    if (bucket) bucket.push(issue)
+    else slots.set(slot, [issue])
+  }
+
+  const dropped = new Set<Issue>()
+  for (const bucket of slots.values()) {
+    if (bucket.length < 2) continue
+    if (!bucket.some((i) => i.code === 'value-not-allowed' || i.code === 'bad-format')) continue
+    for (const issue of bucket) {
+      if (issue.code === 'wrong-type' || issue.code === 'wrong-object-type') dropped.add(issue)
+    }
+  }
+  return issues.filter((issue) => !dropped.has(issue))
+}
+
+const SEVERITY_ORDER: Record<Severity, number> = { violation: 0, warning: 1, info: 2 }
+
+export function documentReport (
+  document: string, conforms: boolean, issues: Issue[],
+): DocumentReport {
+  const sorted = [...issues].sort((a, b) =>
+    SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity] ||
+    (a.location.line ?? 0) - (b.location.line ?? 0))
+  const counts = emptyCounts()
+  for (const issue of sorted) counts[issue.severity]++
+  return { document, conforms, counts, issues: sorted }
+}
+
+// ---------------------------------------------------------------------------
+// Grouping - a presentation concern, shared by the terminal and the web page.
+// ---------------------------------------------------------------------------
+
+export interface IssueGroup {
+  /** `Address (address[0])` - what a reader sees as a heading. */
+  label: string
+  issues: Issue[]
+}
+
+export function groupIssues (issues: Issue[]): IssueGroup[] {
+  const groups = new Map<string, IssueGroup>()
+  for (const issue of issues) {
+    const { jsonPath, nodeType } = issue.location
+    // Group by the node, not the property: everything wrong with address[0].
+    let nodePath = jsonPath
+    if (issue.field !== undefined) {
+      const suffix = `.${issue.field.term}`
+      if (jsonPath.endsWith(suffix)) nodePath = jsonPath.slice(0, -suffix.length)
+      else if (jsonPath === issue.field.term) nodePath = '$'
+    }
+    const atRoot = nodePath === '' || nodePath === '$'
+    // `PlacementAvailability (placementAvailability)` says the same thing twice.
+    const redundant = nodeType !== undefined && nodePath.toLowerCase() === nodeType.toLowerCase()
+    const label = nodeType !== undefined
+      ? (atRoot || redundant ? nodeType : `${nodeType} (${nodePath})`)
+      : atRoot ? 'this record' : nodePath
+
+    const key = `${issue.location.document ?? ''}#${nodePath || '$'}`
+    const existing = groups.get(key)
+    if (existing) existing.issues.push(issue)
+    else groups.set(key, { label, issues: [issue] })
+  }
+  return [...groups.values()]
+}

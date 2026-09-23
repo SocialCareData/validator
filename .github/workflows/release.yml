@@ -40,6 +40,8 @@ jobs:
             exit 1
           fi
 
+      # Deliberately src only: `typecheck`, `test` and `build` all exclude the
+      # web app, which is deployed to GitHub Pages and never published to npm.
       - run: npm run typecheck
       - run: npm test
       - run: npm run build

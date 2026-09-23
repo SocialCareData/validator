@@ -10,16 +10,14 @@ import { describe, expect, test } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { loadProfile } from '../src/catalogue/resolve.js'
-import { createValidator } from '../src/core/validator.js'
-import { readLocal } from '../src/node.js'
-import { testCache } from './helpers/cached-fetch.js'
+import { loadProfile } from '../src/profile.js'
+import { createValidator } from '../src/validate.js'
 
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'cross-checks')
 
 describe('duplicateChildId', () => {
   test('flags the same childId across two records', async () => {
-    const profile = await loadProfile('placements', { cache: testCache, readLocal })
+    const profile = await loadProfile('placements')
     const validator = createValidator(profile)
     const report = await validator.validateAll(
       ['duplicate-a.jsonld', 'duplicate-b.jsonld'].map((name) => ({
@@ -37,7 +35,7 @@ describe('duplicateChildId', () => {
   })
 
   test('passes when each record has its own childId', async () => {
-    const profile = await loadProfile('placements', { cache: testCache, readLocal })
+    const profile = await loadProfile('placements')
     const validator = createValidator(profile)
     const a = JSON.parse(readFileSync(join(fixtures, 'duplicate-a.jsonld'), 'utf8')) as Record<string, unknown>
     const b = JSON.parse(readFileSync(join(fixtures, 'duplicate-b.jsonld'), 'utf8')) as Record<string, unknown>

@@ -43,8 +43,8 @@ checks every time and disables the whole mechanism if one ever appears, and a
 test validates all the bundled examples both ways and asserts the verdicts are
 identical.
 
-The synthetic identifiers are internal. A test renders every example in all five
-output formats and asserts the string `urn:scd:node:` appears in none of them.
+The synthetic identifiers are internal. A test renders every example and asserts
+the string `urn:scd:node:` appears neither in the report text nor in its JSON.
 
 ## Reading the context backwards
 
@@ -87,7 +87,8 @@ at a time will never find them.
 
 ## Why the same code runs in both places
 
-The core takes strings and an injected `fetch`. Nothing under `src/core`,
-`src/catalogue` or `src/report` imports `node:fs`; the filesystem lives in
-`src/cli` and `src/node.ts` only. The web page imports the library source
-directly, so the deployed page and the published package cannot drift apart.
+Everything takes strings and an injected `fetch`, and only `src/cli.ts` imports
+`node:` anything. The web page imports the library source directly, so the
+deployed page and the published package cannot drift apart - and because `src/`
+is what gets published, nothing that exists only for the page is allowed to live
+there.

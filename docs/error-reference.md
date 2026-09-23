@@ -1,7 +1,6 @@
 # What each message means
 
-Every issue carries a `code`. This page explains each one; `scd-validate explain
-<code>` prints the same text in your terminal, and the SARIF output links here.
+Every issue carries a `code`. This page explains each one.
 
 ---
 
@@ -106,20 +105,6 @@ genuinely correct.
 
 ---
 
-## `unknown-field`
-
-This field is not part of the standard at this position.
-
-```
-x postCode is not a field in this standard
-  Did you mean `postcode`?
-```
-
-Almost always a spelling or casing slip. If it is a local extension, it does not
-belong inside a record that claims to follow the standard.
-
----
-
 ## `rule-violation`
 
 A conditional rule has been broken — typically an *Other* code selected without
@@ -141,7 +126,7 @@ files one at a time will never find it — pass them together.
 
 ---
 
-## `input/assumed-context`
+## `assumed-context`
 
 Your document had no `@context`, so the selected profile's published context was
 used to read the field names. This is normally what you want when pasting plain
@@ -149,22 +134,23 @@ JSON, and is informational rather than a problem.
 
 ---
 
-## `input/substituted-context`
+## `substituted-context`
 
-Your document pointed at a `@context` by relative path, which this tool cannot
-resolve — it has no copy of your local file. The profile's published context was
-used instead. If your local context differs from the published one, results may
-not reflect your data as you intended.
+Your document named a `@context` by path or URL. This tool does not fetch
+arbitrary contexts, so the selected profile's published context was used
+instead — that is the one matching the shapes being validated against. If your
+own context differs from it, results may not reflect your data as you intended;
+inline the context in the document to have it used as written.
 
 ---
 
-## `input/parse-error`
+## `parse-error`
 
 The file is not valid JSON. Fix the syntax first; nothing else could be checked.
 
 ---
 
-## `catalogue/shape-unavailable`
+## `shape-unavailable`
 
 A shape the profile expects could not be fetched, so some checks did not run.
 Check the `--ref` you asked for, and your network. Everything reported is still
@@ -175,6 +161,6 @@ accurate — there is simply less of it.
 ## `other`
 
 A SHACL constraint failed that this tool does not yet describe in plain terms. Run
-with `-v` to see the constraint component, and please
+with `--json` to see the constraint component, and please
 [open an issue](https://github.com/SocialCareData/validator/issues) so it can be
 given a proper explanation — that is a bug in this tool, not in your data.

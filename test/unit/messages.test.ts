@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'vitest'
-import { describeConstraint, suggest, friendlyDatatype } from '../../src/report/messages.js'
+import { describeConstraint, friendlyDatatype } from '../../src/messages.js'
 
 const XSD = 'http://www.w3.org/2001/XMLSchema#'
 
 describe('describeConstraint', () => {
   test('a missing required field says what to add, using the shape description', () => {
     const out = describeConstraint({
-      component: 'MinCountConstraintComponent',
+      constraint: 'MinCountConstraintComponent',
       term: 'postcode',
       facts: { minCount: 1, description: 'UK postcode in standard format (e.g. AB1 2CD).' },
       value: undefined,
@@ -18,7 +18,7 @@ describe('describeConstraint', () => {
 
   test('a bad pattern explains the format and gives an example', () => {
     const out = describeConstraint({
-      component: 'PatternConstraintComponent',
+      constraint: 'PatternConstraintComponent',
       term: 'postcode',
       facts: { pattern: '^[A-Z]{1,2}[0-9][0-9A-Z]? ?[0-9][A-Z]{2}$' },
       value: 'NOT A POSTCODE',
@@ -31,22 +31,45 @@ describe('describeConstraint', () => {
     expect(out.hint).not.toContain('^[A-Z]')
   })
 
+  test('an unrecognised pattern falls back to the shape description', () => {
+    const out = describeConstraint({
+      constraint: 'PatternConstraintComponent',
+      term: 'reference',
+      facts: { pattern: '^ZZ[0-9]{2}-[A-F]+$', description: 'A local reference (e.g. ZZ01-ABC).' },
+      value: 'nope',
+    })
+    expect(out.code).toBe('bad-format')
+    expect(out.hint).toContain('A local reference')
+    expect(out.hint).toContain('ZZ01-ABC')
+  })
+
   test('an out-of-vocabulary value lists the tokens, not the IRIs', () => {
     const out = describeConstraint({
-      component: 'InConstraintComponent',
+      constraint: 'InConstraintComponent',
       term: 'genderCode',
       facts: { in: ['https://ontology.socialcaredata.io/gender-code#Male'] },
       value: '7',
-      allowed: ['1', '2', '9', 'X'],
+      allowedValues: ['1', '2', '9', 'X'],
     })
     expect(out.code).toBe('value-not-allowed')
     expect(out.hint).toBe('Allowed values: 1, 2, 9, X.')
     expect(JSON.stringify(out)).not.toContain('ontology.socialcaredata.io')
   })
 
+  test('a long vocabulary is truncated rather than dumped', () => {
+    const out = describeConstraint({
+      constraint: 'InConstraintComponent',
+      term: 'code',
+      facts: {},
+      value: 'x',
+      allowedValues: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+    })
+    expect(out.hint).toContain('and 2 more')
+  })
+
   test('too many values names the limit', () => {
     const out = describeConstraint({
-      component: 'MaxCountConstraintComponent', term: 'name', facts: { maxCount: 1 }, value: undefined,
+      constraint: 'MaxCountConstraintComponent', term: 'name', facts: { maxCount: 1 }, value: undefined,
     })
     expect(out.code).toBe('too-many-values')
     expect(out.title).toContain('only appear once')
@@ -54,7 +77,7 @@ describe('describeConstraint', () => {
 
   test('a wrong datatype is described in words', () => {
     const out = describeConstraint({
-      component: 'DatatypeConstraintComponent',
+      constraint: 'DatatypeConstraintComponent',
       term: 'siblingCount',
       facts: { datatype: `${XSD}integer` },
       value: 'two',
@@ -63,21 +86,9 @@ describe('describeConstraint', () => {
     expect(out.title).toContain('a whole number')
   })
 
-  test('an unknown field offers a suggestion', () => {
-    const out = describeConstraint({
-      component: 'ClosedConstraintComponent',
-      term: 'postCode',
-      facts: {},
-      value: undefined,
-      didYouMean: 'postcode',
-    })
-    expect(out.code).toBe('unknown-field')
-    expect(out.hint).toContain('postcode')
-  })
-
   test('a rules shape keeps its own wording', () => {
     const out = describeConstraint({
-      component: 'NotConstraintComponent',
+      constraint: 'NotConstraintComponent',
       term: undefined,
       facts: { message: 'When culturalNeeds is cln:Other, culturalNeedsOther must be provided.' },
       value: undefined,
@@ -88,7 +99,7 @@ describe('describeConstraint', () => {
 
   test('bounds are reported with the limit and the value', () => {
     const out = describeConstraint({
-      component: 'MinInclusiveConstraintComponent',
+      constraint: 'MinInclusiveConstraintComponent',
       term: 'otherWeeklyCost', facts: { minInclusive: '0' }, value: '-50',
     })
     expect(out.code).toBe('out-of-range')
@@ -98,19 +109,10 @@ describe('describeConstraint', () => {
 
   test('an unrecognised component degrades without crashing', () => {
     const out = describeConstraint({
-      component: 'SomeFutureConstraintComponent', term: 'x', facts: {}, value: undefined,
+      constraint: 'SomeFutureConstraintComponent', term: 'x', facts: {}, value: undefined,
     })
     expect(out.code).toBe('other')
     expect(out.title).toContain('SomeFuture')
-  })
-})
-
-describe('suggest', () => {
-  test('finds a near miss', () => {
-    expect(suggest('postCode', ['postcode', 'city', 'line1'])).toBe('postcode')
-  })
-  test('declines when nothing is close', () => {
-    expect(suggest('zzzzzzzz', ['postcode', 'city'])).toBeUndefined()
   })
 })
 

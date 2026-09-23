@@ -1,5 +1,5 @@
 /*
- * The SHACL engine itself, plus the one guard skolemization depends on.
+ * The SHACL engine, plus the one guard skolemization depends on.
  */
 
 import SHACLValidator from 'rdf-validate-shacl'
@@ -28,14 +28,4 @@ export function requiresBlankNodes (shapes: Dataset): boolean {
   const blankNode = rdf.namedNode(`${SH}BlankNode`)
   for (const _quad of shapes.match(null, nodeKind, blankNode)) return true
   return false
-}
-
-/** Every property path mentioned by a shape - used for did-you-mean hints. */
-export function declaredPaths (shapes: Dataset): string[] {
-  const path = rdf.namedNode(`${SH}path`)
-  const seen = new Set<string>()
-  for (const quad of shapes.match(null, path, null)) {
-    if (quad.object.termType === 'NamedNode') seen.add(quad.object.value)
-  }
-  return [...seen]
 }

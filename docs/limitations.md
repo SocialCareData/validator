@@ -6,8 +6,7 @@ Mapping results back to `address[0].postcode` works for JSON and JSON-LD input.
 Specifically:
 
 - **Turtle or N-Quads input is not supported.** Only JSON in, for now.
-- **A node used in several places** reports the first position, with the others
-  listed as related locations.
+- **A node used in several places** is reported at the first position it appears.
 - **`@index`, `@language` and `@id` container maps, `@nest` and `@reverse`** are
   detected and skipped rather than mis-pathed. Issues inside them report the
   nearest `@id` instead of a path. None of the published Social Care contexts use
@@ -38,14 +37,15 @@ Specifically:
   `--ref` for anything repeatable.
 - **A mutable ref is not tamper-evident.** There is no integrity check on fetched
   shapes beyond HTTPS.
-- **A relative `@context` in your file cannot be honoured** — we do not have your
-  local copy. The profile's published context is substituted and an informational
-  issue says so. If the two differ, results may not reflect what you intended.
+- **A `@context` named by path or URL is not fetched.** The profile's published
+  context is used instead and an informational issue says so. Inline the context
+  in the document if you need your own to be used as written.
+- **Shapes are fetched on every run.** Two or three small files, so this is
+  ordinarily unnoticeable, but it does mean the CLI needs a network.
 
 ## Reporting
 
 - **Regex descriptions are a lookup, not a translator.** Patterns the tool does not
-  recognise are described using the shape's own `sh:description`, or named as a
-  pattern without being translated into prose.
+  recognise are described using the shape's own `sh:description` instead.
 - **`other` means we have no plain-English wording** for that constraint yet.
   Please report it.

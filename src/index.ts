@@ -1,56 +1,51 @@
 /*
  * Public API.
  *
- * Isomorphic: this entry point never touches the filesystem, so the same build
- * serves Node, bundlers and the browser. Node-only helpers (reading files,
- * stdin, the disk cache) live in `@socialcaredata/validator/node`.
+ * Isomorphic throughout: nothing here touches the filesystem, so the same build
+ * serves Node, bundlers and the browser.
  */
 
-export { catalogue, getEntry, profileUrls, rawUrl, DEFAULT_REF, ONTOLOGY_REPO } from './catalogue/entries.js'
-export type { CatalogueEntry, ShapeRef, ProfileUrls } from './catalogue/entries.js'
+export { profiles, getProfile, rawUrl, DEFAULT_REF, ONTOLOGY_REPO } from './catalogue.js'
+export type { Profile, ShapeRef } from './catalogue.js'
 
-export { loadProfile } from './catalogue/resolve.js'
-export type { LoadedProfile, LoadOptions, LocalReader } from './catalogue/resolve.js'
+export { loadProfile } from './profile.js'
+export type { LoadedProfile, LoadOptions } from './profile.js'
 
-export { Fetcher, MemoryCache, FetchError, NotFoundError, ALLOWED_HOSTS } from './catalogue/fetcher.js'
-export type { FetchCache, CacheEntry, FetcherOptions } from './catalogue/fetcher.js'
+export { fetchText, FetchError, NotFoundError } from './fetch.js'
+export type { Fetch } from './fetch.js'
 
-export { Validator, createValidator, VALIDATOR_NAME } from './core/validator.js'
-export type { DocumentInput, ValidatorOptions } from './core/validator.js'
+export { Validator, createValidator } from './validate.js'
+export type { DocumentInput } from './validate.js'
 
-export { skolemize, isSkolemIri, SKOLEM_PREFIX } from './core/skolemize.js'
-export type { NodeLocation, SkolemizeResult } from './core/skolemize.js'
-
-export { ContextIndex } from './core/context.js'
-export { CROSS_CHECKS, duplicateChildId } from './core/cross-checks.js'
-export type { CrossCheck, CrossCheckResult } from './core/cross-checks.js'
-
-export { render, renderPretty } from './report/render/index.js'
-export type { Format, RenderOptions } from './report/render/index.js'
-
-export { SCHEMA_VERSION } from './report/types.js'
+export { groupIssues } from './report.js'
 export type {
-  Issue, IssueCode, IssueGroup, Location, Expectation, Severity,
-  DocumentReport, CrossCheckReport, RunReport,
-} from './report/types.js'
+  Issue, IssueCode, IssueGroup, Location, Severity, DocumentReport, CrossCheckReport, RunReport,
+} from './report.js'
 
-import { loadProfile, type LoadOptions, type LoadedProfile } from './catalogue/resolve.js'
-import { createValidator, type DocumentInput, type ValidatorOptions } from './core/validator.js'
-import type { RunReport } from './report/types.js'
+export { renderPretty } from './pretty.js'
+export type { PrettyOptions } from './pretty.js'
+
+export { skolemize, isSkolemIri, SKOLEM_PREFIX } from './skolemize.js'
+export type { NodeLocation } from './skolemize.js'
+
+export { ContextIndex } from './context.js'
+
+import { loadProfile, type LoadOptions } from './profile.js'
+import { createValidator, type DocumentInput } from './validate.js'
+import type { RunReport } from './report.js'
 
 /**
- * Validate one or more documents against a profile, in a single call.
+ * Validate one or more documents against a profile.
  *
  * ```ts
- * const report = await validate(myJson, 'person:subject-of-care')
+ * const report = await validate(myRecord, 'person:subject-of-care')
  * ```
  */
 export async function validate (
   input: DocumentInput | string | object | (DocumentInput | string | object)[],
-  profile: string | LoadedProfile,
-  opts: LoadOptions & ValidatorOptions = {},
+  profileId: string,
+  opts: LoadOptions = {},
 ): Promise<RunReport> {
-  const loaded = typeof profile === 'string' ? await loadProfile(profile, opts) : profile
-  const validator = createValidator(loaded, opts)
+  const validator = createValidator(await loadProfile(profileId, opts))
   return validator.validateAll(Array.isArray(input) ? input : [input])
 }

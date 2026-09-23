@@ -13,5 +13,4 @@
   tricks that make the output readable.
 - **[Limitations](limitations.md)** — what this tool does not do.
 - **[Contributing](contributing.md)** — layout, adding a profile, the expectations
-  files.
-- **[Releasing](releasing.md)** — cutting a version.
+  files, releasing.

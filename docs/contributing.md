@@ -2,36 +2,53 @@
 
 ```bash
 npm install
-npm run typecheck
+npm run typecheck           # src only - what gets published
 npm test                    # unit, conformance, integrity, cross-record
+npm run typecheck:web
 npx playwright install chromium
 npm run test:web            # drives the page in a real browser
 npm run dev:web             # the page, locally
 ```
 
-Tests fetch real shapes from the ontology repository and cache them in
-`.cache/shapes` (gitignored), so only the first run needs a network.
+Tests fetch real shapes from the ontology repository, so they need a network.
 
 ## Layout
 
 ```
-src/core/       parsing, skolemization, the SHACL run   - isomorphic
-src/catalogue/  which shapes exist and how to fetch them - isomorphic
-src/report/     turning results into sentences           - isomorphic
-src/cli/        the command line                         - Node only
-src/node.ts     filesystem, stdin, disk cache            - Node only
-web/            the GitHub Pages app
-examples/       the conformance fixtures
+src/        the published package - the library and the CLI
+web/        the GitHub Pages app - never published to npm
+examples/   the conformance fixtures
 ```
 
-**`node:` imports are only allowed in `src/cli/` and `src/node.ts`.** Everything
-else has to run in a browser. A test asserts the built `dist/index.js` pulls in no
-Node builtins; please keep it that way.
+`src/` is flat, one job per file:
+
+| File | Job |
+| --- | --- |
+| `catalogue.ts` | which profiles exist and which files each one loads |
+| `fetch.ts` | fetching a text file over HTTPS |
+| `profile.ts` | loading a profile: shapes, context, cross-checks |
+| `validate.ts` | the pipeline, from JSON to a report |
+| `skolemize.ts` | naming anonymous nodes, and locating pointers in the source |
+| `context.ts` | reading a JSON-LD context backwards |
+| `jsonld.ts` | choosing a context, and converting to RDF |
+| `rdf.ts` / `shacl.ts` | parsing Turtle, running the engine |
+| `shape-facts.ts` | reading constraints back off the shape that raised them |
+| `messages.ts` | turning a constraint into a sentence |
+| `report.ts` | the report types, building issues, grouping them |
+| `pretty.ts` | terminal output |
+| `cli.ts` | the command |
+| `cross-checks.ts` | constraints that span a whole set of records |
+
+**Two rules about the split.** `src/` is what gets published, so nothing that
+exists only for the web page belongs there — the profile descriptions in the
+`<select>`, for instance, live in `web/src/descriptions.ts`. And only `cli.ts`
+may import `node:` builtins; everything else has to run in a browser.
 
 ## Adding a profile
 
-1. Add an entry to `src/catalogue/entries.ts` — module, shape files, context,
-   any cross-record checks, and a one-sentence `describes` for the picker.
+1. Add an entry to `src/catalogue.ts` — shape files, context, and any
+   cross-record checks. If it should appear in the web picker, add a line to
+   `web/src/descriptions.ts` too.
 2. Put examples under `examples/<name>/`, named `valid-*.jsonld` and
    `invalid-*.jsonld`.
 3. Run `npm run test:conformance`. The suite discovers the new folder
@@ -61,10 +78,9 @@ nobody has read is just a record of current behaviour, including its bugs.
 
 ## Adding a plain-English message
 
-`src/report/messages.ts` maps SHACL constraint components to sentences. Add a
-case there, a test in `test/unit/messages.test.ts`, and a section in
-`docs/error-reference.md` — the code is a documented interface, linked from SARIF
-output and printed by `scd-validate explain`.
+`src/messages.ts` maps SHACL constraint components to sentences. Add a case
+there, a test in `test/unit/messages.test.ts`, and a section in
+`docs/error-reference.md` — the code is a documented interface.
 
 Two rules for the wording:
 
@@ -74,4 +90,17 @@ Two rules for the wording:
 
 ## Releasing
 
-See [releasing.md](releasing.md).
+1. Update the version in `package.json` and open a pull request.
+2. Once merged, create a GitHub Release tagged `vX.Y.Z`.
+3. `release.yml` checks the tag matches `package.json`, runs the src-only
+   test suite, builds and publishes to npm with provenance. The web app is not
+   built or shipped.
+
+Publishing needs the `@socialcaredata` scope on npm and this repository allowed
+to publish to it; prefer
+[trusted publishing](https://docs.npmjs.com/trusted-publishers), which needs no
+secret. GitHub Pages needs Settings → Pages → Source: **GitHub Actions**, once.
+
+When the ontology repo cuts its first tag, change `DEFAULT_REF` in
+`src/catalogue.ts` from `main` to that tag, run `npm run test:conformance`, and
+release.

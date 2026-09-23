@@ -10,32 +10,30 @@ import { describe, expect, test, beforeAll } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { catalogue } from '../src/catalogue/entries.js'
-import { loadProfile, type LoadedProfile } from '../src/catalogue/resolve.js'
-import { createValidator } from '../src/core/validator.js'
-import { render } from '../src/report/render/index.js'
-import { requiresBlankNodes } from '../src/core/shacl.js'
-import { readLocal } from '../src/node.js'
-import { SKOLEM_PREFIX } from '../src/core/skolemize.js'
-import { testCache } from './helpers/cached-fetch.js'
+import { profiles } from '../src/catalogue.js'
+import { loadProfile, type LoadedProfile } from '../src/profile.js'
+import { createValidator } from '../src/validate.js'
+import { renderPretty } from '../src/pretty.js'
+import { requiresBlankNodes } from '../src/shacl.js'
+import { SKOLEM_PREFIX } from '../src/skolemize.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-const profiles: Record<string, LoadedProfile> = {}
+const loaded: Record<string, LoadedProfile> = {}
 
 beforeAll(async () => {
-  for (const entry of catalogue) {
-    profiles[entry.id] = await loadProfile(entry.id, { cache: testCache, readLocal })
+  for (const entry of profiles) {
+    loaded[entry.id] = await loadProfile(entry.id)
   }
 })
 
 describe('skolemization is verdict-neutral', () => {
-  for (const entry of catalogue) {
+  for (const entry of profiles) {
     const dir = join(root, entry.examples)
     const files = readdirSync(dir).filter((f) => f.endsWith('.jsonld')).sort()
 
     test.each(files)(`${entry.id} / %s`, async (file) => {
-      const profile = profiles[entry.id]!
+      const profile = loaded[entry.id]!
       const text = readFileSync(join(dir, file), 'utf8')
 
       const withSkolem = await createValidator(profile, { skolemize: true })
@@ -49,34 +47,33 @@ describe('skolemization is verdict-neutral', () => {
 })
 
 describe('synthetic identifiers stay internal', () => {
-  test.each(catalogue.map((e) => e.id))('%s', async (id) => {
-    const entry = catalogue.find((e) => e.id === id)!
+  test.each(profiles.map((e) => e.id))('%s', async (id) => {
+    const entry = profiles.find((e) => e.id === id)!
     const dir = join(root, entry.examples)
     const files = readdirSync(dir).filter((f) => f.endsWith('.jsonld')).sort()
-    const validator = createValidator(profiles[id]!)
+    const validator = createValidator(loaded[id]!)
     const report = await validator.validateAll(files.map((f) => ({
       name: f, text: readFileSync(join(dir, f), 'utf8'),
     })))
 
-    for (const format of ['pretty', 'json', 'github', 'sarif', 'summary'] as const) {
-      expect(render(report, format, { color: false })).not.toContain(SKOLEM_PREFIX)
-    }
+    expect(renderPretty(report, { color: false })).not.toContain(SKOLEM_PREFIX)
+    expect(JSON.stringify(report)).not.toContain(SKOLEM_PREFIX)
   })
 })
 
 describe('the published shapes permit skolemization', () => {
-  test.each(catalogue.map((e) => e.id))('%s has no sh:nodeKind sh:BlankNode', (id) => {
-    expect(requiresBlankNodes(profiles[id]!.shapes)).toBe(false)
-    expect(profiles[id]!.skolemSafe).toBe(true)
+  test.each(profiles.map((e) => e.id))('%s has no sh:nodeKind sh:BlankNode', (id) => {
+    expect(requiresBlankNodes(loaded[id]!.shapes)).toBe(false)
+    expect(loaded[id]!.skolemSafe).toBe(true)
   })
 })
 
 describe('reports never leak raw IRIs into the human layer', () => {
-  test.each(catalogue.map((e) => e.id))('%s', async (id) => {
-    const entry = catalogue.find((e) => e.id === id)!
+  test.each(profiles.map((e) => e.id))('%s', async (id) => {
+    const entry = profiles.find((e) => e.id === id)!
     const dir = join(root, entry.examples)
     const files = readdirSync(dir).filter((f) => f.startsWith('invalid-')).sort()
-    const validator = createValidator(profiles[id]!)
+    const validator = createValidator(loaded[id]!)
     for (const file of files) {
       const report = await validator.validate({
         name: file, text: readFileSync(join(dir, file), 'utf8'),

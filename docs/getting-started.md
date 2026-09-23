@@ -26,11 +26,7 @@ npm install --global @socialcaredata/validator
 scd-validate -p person:subject-of-care mydata.jsonld
 ```
 
-Not sure which profile you want?
-
-```bash
-scd-validate profiles
-```
+`scd-validate --help` lists the profiles.
 
 Several files at once — useful because some checks look across a whole set of
 records rather than one at a time:
@@ -63,8 +59,8 @@ mydata.jsonld -> fails
 - **the caret** — the offending value in your file.
 - **the last line** — what the standard expects, and an example.
 
-`-v` adds the underlying SHACL detail (focus node, shape, constraint component) to
-every issue, if you want to see the machinery.
+`--json` prints the whole report as JSON, including a `technical` block per issue
+carrying the focus node, shape and constraint component.
 
 ## What the exit code means
 
