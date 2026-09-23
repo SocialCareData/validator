@@ -37,7 +37,7 @@ an example.
 npm install --global @socialcaredata/validator   # or use npx, as above
 ```
 
-Node 20.19 or newer.
+Node 22 or newer.
 
 ## Usage
 
