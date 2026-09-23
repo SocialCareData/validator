@@ -3,14 +3,66 @@
 ```bash
 npm install
 npm run typecheck           # src only - what gets published
-npm test                    # unit, conformance, integrity, cross-record
-npm run typecheck:web
-npx playwright install chromium
-npm run test:web            # drives the page in a real browser
-npm run dev:web             # the page, locally
+npm test                    # unit, conformance, integrity, cross-record, structure
 ```
 
 Tests fetch real shapes from the ontology repository, so they need a network.
+
+## Running the web app locally
+
+```bash
+npm run dev:web
+```
+
+Then open **<http://localhost:5173/validator/>**. Mind the `/validator/` — the
+app is built with that base path because it is served from
+`socialcaredata.github.io/validator/`, and the bare `/` just redirects there.
+
+Vite reloads on save, and that includes `src/`: the page imports the library
+source directly rather than the built `dist/`, so a change to a message or a
+shape-fact is on screen as soon as you save it. No `npm run build` in the loop.
+
+To check the real production bundle - the thing GitHub Pages actually serves:
+
+```bash
+npm run build:web
+npm run preview             # http://localhost:4173/validator/
+```
+
+Worth doing before touching anything in the worker: the dev server and the
+production bundle resolve dependencies differently, and the browser-only
+failures this project has hit (`window is not defined` inside the worker) showed
+up in bundling, not in source.
+
+The page fetches shapes from `raw.githubusercontent.com` at run time, so it needs
+a network. If validation fails with a fetch error, check the ref in **Advanced**.
+
+## Testing the web app
+
+```bash
+npx playwright install chromium    # once
+npm run test:web
+```
+
+Six tests drive a real Chromium against a real dev server: every profile is
+listed, a bad postcode reports the field name and line number, a valid record
+passes, a controlled vocabulary renders its permitted values, malformed JSON is
+explained rather than swallowed, and the browser console stays clean throughout.
+
+That last one is not padding. It is what caught `window is not defined` - the
+worker died on load, and every other assertion had simply timed out without
+saying why.
+
+To watch it happen rather than read a stack trace:
+
+```bash
+HEADED=1 npm run test:web              # opens a real window
+HEADED=1 SLOWMO=250 npm run test:web   # slowly enough to follow
+npx vitest run test/web.test.ts --reporter verbose
+```
+
+`npm run typecheck:web` typechecks the app. It is deliberately separate from
+`npm run typecheck`, which covers only `src/` - what gets published.
 
 ## Layout
 

@@ -32,7 +32,12 @@ beforeAll(async () => {
   const port = typeof address === 'object' && address !== null ? address.port : 0
   baseUrl = `http://localhost:${port}${server.config.base}`
 
-  browser = await chromium.launch()
+  // HEADED=1 opens a real window, and SLOWMO=250 slows it enough to watch.
+  // Debugging a failure by reading a stack trace is much harder than looking.
+  browser = await chromium.launch({
+    headless: process.env['HEADED'] !== '1',
+    slowMo: Number(process.env['SLOWMO'] ?? 0),
+  })
   page = await browser.newPage()
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text())
