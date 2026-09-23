@@ -1,12 +1,13 @@
 /*
  * Page wiring. Validation happens in a worker; this file only collects input,
- * renders the report, and keeps the gutter in step with the textarea.
+ * renders the report, and keeps the gutter and colouring in step with the textarea.
  */
 
 import { profiles, getProfile, DEFAULT_REF } from '@validator/shapes/catalogue.js'
 import { groupIssues } from '@validator/report/build.js'
 import type { Issue, RunReport, Severity } from '@validator/report/types.js'
 import { DESCRIPTIONS } from './descriptions.js'
+import { highlightJson } from './highlight.js'
 import type { ValidateRequest, WorkerResponse } from './worker.js'
 
 const $ = <T extends HTMLElement>(id: string): T => {
@@ -21,6 +22,7 @@ const exampleSelect = $<HTMLSelectElement>('example')
 const refInput = $<HTMLInputElement>('ref')
 const input = $<HTMLTextAreaElement>('input')
 const gutter = $<HTMLPreElement>('gutter')
+const highlight = $<HTMLElement>('highlight')
 const results = $<HTMLElement>('results')
 const validateButton = $<HTMLButtonElement>('validate')
 const form = $<HTMLFormElement>('controls')
@@ -57,32 +59,44 @@ function refreshExamples (): void {
     const key = exampleKey(path)
     if (!key.startsWith(prefix)) continue
     const name = key.slice(prefix.length).replace(/\.jsonld$/, '')
-    const label = name.startsWith('valid-') ? `${name}  (should pass)` : `${name}  (should fail)`
-    exampleSelect.add(new Option(label, path))
+    // The invalid examples are the conformance suite's negative cases, there to
+    // pin the error output. As a starting point for someone's own record they
+    // only mislead.
+    if (!name.startsWith('valid-')) continue
+    exampleSelect.add(new Option(name, path))
   }
 }
 
 // ---------------------------------------------------------------------------
-// Editor gutter
+// Editor: gutter and colouring
 // ---------------------------------------------------------------------------
 
 let flaggedLines = new Set<number>()
 
-function renderGutter (): void {
+/** The gutter and the colour layer only look right while they scroll with the textarea. */
+function syncScroll (): void {
+  gutter.scrollTop = input.scrollTop
+  highlight.scrollTop = input.scrollTop
+  highlight.scrollLeft = input.scrollLeft
+}
+
+/** Redraw everything derived from the textarea. Call after any change to its value. */
+function renderEditor (): void {
+  highlight.innerHTML = highlightJson(input.value)
   const lines = input.value.split('\n').length
   const out: string[] = []
   for (let n = 1; n <= Math.max(lines, 1); n++) {
     out.push(flaggedLines.has(n) ? `<span class="flagged">${n}</span>` : String(n))
   }
   gutter.innerHTML = out.join('\n')
-  gutter.scrollTop = input.scrollTop
+  syncScroll()
 }
 
 input.addEventListener('input', () => {
   flaggedLines = new Set()
-  renderGutter()
+  renderEditor()
 })
-input.addEventListener('scroll', () => { gutter.scrollTop = input.scrollTop })
+input.addEventListener('scroll', syncScroll)
 
 /** Put the caret on a line and scroll it into view. */
 function jumpToLine (line: number, column = 1): void {
@@ -94,7 +108,7 @@ function jumpToLine (line: number, column = 1): void {
   input.setSelectionRange(start, start + Math.max(1, (lines[line - 1]?.length ?? 1) - column + 1))
   const lineHeight = input.scrollHeight / Math.max(lines.length, 1)
   input.scrollTop = Math.max(0, (line - 4) * lineHeight)
-  gutter.scrollTop = input.scrollTop
+  syncScroll()
 }
 
 // ---------------------------------------------------------------------------
@@ -218,7 +232,7 @@ function renderReport (report: RunReport): void {
       flaggedLines.add(issue.location.line)
     }
   }
-  renderGutter()
+  renderEditor()
 
   for (const group of groupIssues(doc.issues.filter((i) => i.severity !== 'info'))) {
     const section = el('section', 'group')
@@ -300,7 +314,7 @@ exampleSelect.addEventListener('change', () => {
   if (path === '') return
   input.value = exampleFiles[path] ?? ''
   flaggedLines = new Set()
-  renderGutter()
+  renderEditor()
   results.replaceChildren()
   run()
 })
@@ -309,7 +323,7 @@ $<HTMLButtonElement>('clear').addEventListener('click', () => {
   input.value = ''
   exampleSelect.value = ''
   flaggedLines = new Set()
-  renderGutter()
+  renderEditor()
   results.replaceChildren()
 })
 
@@ -326,7 +340,7 @@ input.addEventListener('drop', (event) => {
   void file.text().then((text) => {
     input.value = text
     flaggedLines = new Set()
-    renderGutter()
+    renderEditor()
   })
 })
 
@@ -338,4 +352,4 @@ try {
 }
 
 refreshExamples()
-renderGutter()
+renderEditor()
