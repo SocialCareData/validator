@@ -53,7 +53,8 @@
     "test": "vitest run --exclude '**/web.test.ts' --exclude '**/node_modules/**'",
     "test:web": "vitest run test/web.test.ts",
     "test:conformance": "vitest run test/conformance.test.ts",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "expectations": "npm run build && node scripts/update-expectations.mjs"
   },
   "dependencies": {
     "commander": "^12.1.0",
