@@ -10,7 +10,7 @@
  * "must be one of: usual, official, temp" instead of quoting four IRIs.
  */
 
-import { rdf } from './rdf.js'
+import { rdf } from '../rdf/parse.js'
 import type { Dataset } from 'rdf-ext'
 import type { Term } from 'n3'
 

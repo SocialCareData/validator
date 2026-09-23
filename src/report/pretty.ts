@@ -7,8 +7,8 @@
  */
 
 import pc from 'picocolors'
-import { groupIssues } from './report.js'
-import type { Issue, RunReport, Severity } from './report.js'
+import { groupIssues } from './build.js'
+import type { Issue, RunReport, Severity } from './types.js'
 
 export interface PrettyOptions {
   color?: boolean

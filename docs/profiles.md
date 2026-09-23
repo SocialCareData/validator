@@ -61,6 +61,6 @@ than failing. The rest of the checks are unaffected.
 
 ## Adding a profile
 
-Add an entry to `src/catalogue.ts`, put its examples under `examples/<name>/`
+Add an entry to `src/shapes/catalogue.ts`, put its examples under `examples/<name>/`
 following the `valid-*` / `invalid-*` convention, and the conformance suite will
 pick them up automatically. See [contributing](contributing.md).

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { describeConstraint, friendlyDatatype } from '../../src/messages.js'
+import { describeConstraint, friendlyDatatype } from '../../src/report/messages.js'
 
 const XSD = 'http://www.w3.org/2001/XMLSchema#'
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import { skolemize, SKOLEM_PREFIX } from '../../src/skolemize.js'
-import { ContextIndex } from '../../src/context.js'
+import { skolemize, SKOLEM_PREFIX } from '../../src/document/skolemize.js'
+import { ContextIndex } from '../../src/document/context.js'
 
 const ctx = new ContextIndex({
   p: 'https://ontology.socialcaredata.io/',

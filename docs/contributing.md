@@ -20,24 +20,45 @@ web/        the GitHub Pages app - never published to npm
 examples/   the conformance fixtures
 ```
 
-`src/` is flat, one job per file:
+`src/` is laid out as the path a record takes through the tool:
 
-| File | Job |
-| --- | --- |
-| `catalogue.ts` | which profiles exist and which files each one loads |
-| `fetch.ts` | fetching a text file over HTTPS |
-| `profile.ts` | loading a profile: shapes, context, cross-checks |
-| `validate.ts` | the pipeline, from JSON to a report |
-| `skolemize.ts` | naming anonymous nodes, and locating pointers in the source |
-| `context.ts` | reading a JSON-LD context backwards |
-| `jsonld.ts` | choosing a context, and converting to RDF |
-| `rdf.ts` / `shacl.ts` | parsing Turtle, running the engine |
-| `shape-facts.ts` | reading constraints back off the shape that raised them |
-| `messages.ts` | turning a constraint into a sentence |
-| `report.ts` | the report types, building issues, grouping them |
-| `pretty.ts` | terminal output |
-| `cli.ts` | the command |
-| `cross-checks.ts` | constraints that span a whole set of records |
+```
+src/
+  index.ts            the public API
+  cli.ts              the command line
+  validator.ts        the pipeline that ties the four stages together
+
+  shapes/             1. where the shapes come from
+    catalogue.ts        which profiles exist, and which files each one loads
+    fetch.ts            fetching a text file over HTTPS
+    profile.ts          a profile, loaded and ready to validate against
+
+  document/           2. the user's JSON, on its way to RDF - and back
+    skolemize.ts        naming anonymous nodes; locating pointers in the source
+    context.ts          reading a JSON-LD context backwards
+    jsonld.ts           choosing a context, and converting to RDF
+
+  rdf/                3. the RDF layer
+    parse.ts            Turtle and N-Quads into a dataset
+    shacl.ts            the engine, and the guard skolemization depends on
+    cross-checks.ts     constraints that span a whole set of records
+
+  report/             4. results, in English
+    types.ts            the report contract
+    shape-facts.ts      reading constraints back off the shape that raised them
+    messages.ts         a constraint, as a sentence
+    build.ts            SHACL results -> issues, and grouping them
+    pretty.ts           terminal output
+
+  types/vendor.d.ts   ambient declarations for the untyped RDF stack
+```
+
+That reading order is the pipeline, not the dependency order. Imports form a DAG
+with no cycles, and it runs the other way: `rdf/` depends on nothing else here,
+`document/` builds on `rdf/`, `report/` builds on both, and `shapes/` uses all
+three to assemble a profile. `validator.ts` is the only module that reaches into
+every folder. `test/architecture.test.ts` checks this, so a new import that
+breaks it fails the build rather than quietly eroding the structure.
 
 **Two rules about the split.** `src/` is what gets published, so nothing that
 exists only for the web page belongs there — the profile descriptions in the
@@ -46,7 +67,7 @@ may import `node:` builtins; everything else has to run in a browser.
 
 ## Adding a profile
 
-1. Add an entry to `src/catalogue.ts` — shape files, context, and any
+1. Add an entry to `src/shapes/catalogue.ts` — shape files, context, and any
    cross-record checks. If it should appear in the web picker, add a line to
    `web/src/descriptions.ts` too.
 2. Put examples under `examples/<name>/`, named `valid-*.jsonld` and
@@ -78,7 +99,7 @@ nobody has read is just a record of current behaviour, including its bugs.
 
 ## Adding a plain-English message
 
-`src/messages.ts` maps SHACL constraint components to sentences. Add a case
+`src/report/messages.ts` maps SHACL constraint components to sentences. Add a case
 there, a test in `test/unit/messages.test.ts`, and a section in
 `docs/error-reference.md` — the code is a documented interface.
 
@@ -102,5 +123,5 @@ to publish to it; prefer
 secret. GitHub Pages needs Settings → Pages → Source: **GitHub Actions**, once.
 
 When the ontology repo cuts its first tag, change `DEFAULT_REF` in
-`src/catalogue.ts` from `main` to that tag, run `npm run test:conformance`, and
+`src/shapes/catalogue.ts` from `main` to that tag, run `npm run test:conformance`, and
 release.

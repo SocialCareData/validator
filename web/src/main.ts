@@ -3,9 +3,9 @@
  * renders the report, and keeps the gutter in step with the textarea.
  */
 
-import { profiles, getProfile, DEFAULT_REF } from '@validator/catalogue.js'
-import { groupIssues } from '@validator/report.js'
-import type { Issue, RunReport, Severity } from '@validator/report.js'
+import { profiles, getProfile, DEFAULT_REF } from '@validator/shapes/catalogue.js'
+import { groupIssues } from '@validator/report/build.js'
+import type { Issue, RunReport, Severity } from '@validator/report/types.js'
 import { DESCRIPTIONS } from './descriptions.js'
 import type { ValidateRequest, WorkerResponse } from './worker.js'
 

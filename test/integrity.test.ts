@@ -10,12 +10,12 @@ import { describe, expect, test, beforeAll } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { profiles } from '../src/catalogue.js'
-import { loadProfile, type LoadedProfile } from '../src/profile.js'
-import { createValidator } from '../src/validate.js'
-import { renderPretty } from '../src/pretty.js'
-import { requiresBlankNodes } from '../src/shacl.js'
-import { SKOLEM_PREFIX } from '../src/skolemize.js'
+import { profiles } from '../src/shapes/catalogue.js'
+import { loadProfile, type LoadedProfile } from '../src/shapes/profile.js'
+import { createValidator } from '../src/validator.js'
+import { renderPretty } from '../src/report/pretty.js'
+import { requiresBlankNodes } from '../src/rdf/shacl.js'
+import { SKOLEM_PREFIX } from '../src/document/skolemize.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 

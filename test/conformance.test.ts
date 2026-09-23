@@ -13,9 +13,9 @@ import { describe, expect, test, beforeAll } from 'vitest'
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { profiles } from '../src/catalogue.js'
-import { loadProfile, type LoadedProfile } from '../src/profile.js'
-import { createValidator } from '../src/validate.js'
+import { profiles } from '../src/shapes/catalogue.js'
+import { loadProfile, type LoadedProfile } from '../src/shapes/profile.js'
+import { createValidator } from '../src/validator.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 

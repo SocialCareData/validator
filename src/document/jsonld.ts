@@ -13,7 +13,7 @@
  */
 
 import jsonld from 'jsonld'
-import { parseNQuads } from './rdf.js'
+import { parseNQuads } from '../rdf/parse.js'
 import type { Dataset } from 'rdf-ext'
 
 export type JsonLdContext = Record<string, unknown> | unknown[]

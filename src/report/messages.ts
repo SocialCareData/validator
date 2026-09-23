@@ -10,7 +10,7 @@
  */
 
 import type { ShapeFacts } from './shape-facts.js'
-import type { IssueCode } from './report.js'
+import type { IssueCode } from './types.js'
 
 export interface MessageInput {
   /** Component name with the `sh:` prefix stripped. */

@@ -12,12 +12,12 @@
 import { Command, Option } from 'commander'
 import { createRequire } from 'node:module'
 import { readFile } from 'node:fs/promises'
-import { profiles, DEFAULT_REF } from './catalogue.js'
-import { loadProfile } from './profile.js'
-import { createValidator } from './validate.js'
-import { renderPretty } from './pretty.js'
-import { FetchError } from './fetch.js'
-import type { DocumentInput } from './validate.js'
+import { profiles, DEFAULT_REF } from './shapes/catalogue.js'
+import { loadProfile } from './shapes/profile.js'
+import { createValidator } from './validator.js'
+import { renderPretty } from './report/pretty.js'
+import { FetchError } from './shapes/fetch.js'
+import type { DocumentInput } from './validator.js'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json') as { version: string }

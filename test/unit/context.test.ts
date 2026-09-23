@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { ContextIndex } from '../../src/context.js'
+import { ContextIndex } from '../../src/document/context.js'
 
 const ctx = new ContextIndex({
   p: 'https://ontology.socialcaredata.io/',

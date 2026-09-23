@@ -8,9 +8,9 @@
 // Side-effect import, and it has to come first - see the file for why.
 import './worker-globals.js'
 
-import { loadProfile } from '@validator/profile.js'
-import { createValidator } from '@validator/validate.js'
-import type { RunReport } from '@validator/report.js'
+import { loadProfile } from '@validator/shapes/profile.js'
+import { createValidator } from '@validator/validator.js'
+import type { RunReport } from '@validator/report/types.js'
 
 export interface ValidateRequest {
   kind: 'validate'

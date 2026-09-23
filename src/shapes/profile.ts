@@ -5,12 +5,12 @@
 
 import { getProfile, rawUrl, DEFAULT_REF } from './catalogue.js'
 import { fetchText, NotFoundError, type Fetch } from './fetch.js'
-import { mergeTurtle } from './rdf.js'
-import { ContextIndex } from './context.js'
-import { requiresBlankNodes } from './shacl.js'
-import { unwrapContext, type JsonLdContext } from './jsonld.js'
-import { CROSS_CHECKS, type CrossCheck } from './cross-checks.js'
-import { noteIssue, type Issue } from './report.js'
+import { mergeTurtle } from '../rdf/parse.js'
+import { ContextIndex } from '../document/context.js'
+import { requiresBlankNodes } from '../rdf/shacl.js'
+import { unwrapContext, type JsonLdContext } from '../document/jsonld.js'
+import { CROSS_CHECKS, type CrossCheck } from '../rdf/cross-checks.js'
+import { noteIssue, type Issue } from '../report/types.js'
 import type { Dataset } from 'rdf-ext'
 
 export interface LoadedProfile {

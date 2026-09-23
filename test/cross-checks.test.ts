@@ -10,8 +10,8 @@ import { describe, expect, test } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { loadProfile } from '../src/profile.js'
-import { createValidator } from '../src/validate.js'
+import { loadProfile } from '../src/shapes/profile.js'
+import { createValidator } from '../src/validator.js'
 
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'cross-checks')
 

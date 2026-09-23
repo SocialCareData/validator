@@ -3,7 +3,7 @@
  * express at all - it validates one focus node at a time.
  */
 
-import { rdf } from './rdf.js'
+import { rdf } from './parse.js'
 import type { Dataset } from 'rdf-ext'
 
 export interface CrossCheckDocument {

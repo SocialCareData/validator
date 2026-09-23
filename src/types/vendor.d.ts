@@ -2,7 +2,7 @@
  * Minimal ambient declarations for the RDF toolchain.
  *
  * None of n3, jsonld, rdf-ext or rdf-validate-shacl ship TypeScript types, and
- * @types packages for them either do not exist or lag badly. Rather than turn
+ * @types packages for them either do not exist or are not reusable. Rather than turn
  * strict mode off for the whole project, we declare exactly the surface this
  * validator touches. If a call site needs something new, add it here first -
  * that keeps the "what do we actually depend on" list short and visible.

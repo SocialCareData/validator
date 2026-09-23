@@ -7,13 +7,14 @@
  * textarea's value; neither changes what happens here.
  */
 
-import { skolemize, type NodeLocation, type SourceMap } from './skolemize.js'
-import { resolveContext, toDataset } from './jsonld.js'
-import { createShaclValidator } from './shacl.js'
-import { buildIssues, documentReport, emptyCounts, noteIssue } from './report.js'
-import type { DocumentReport, Issue, RunReport, Severity } from './report.js'
-import type { LoadedProfile } from './profile.js'
-import type { CrossCheckDocument } from './cross-checks.js'
+import { skolemize, type NodeLocation, type SourceMap } from './document/skolemize.js'
+import { resolveContext, toDataset } from './document/jsonld.js'
+import { createShaclValidator } from './rdf/shacl.js'
+import { buildIssues, documentReport } from './report/build.js'
+import { emptyCounts, noteIssue } from './report/types.js'
+import type { DocumentReport, Issue, RunReport, Severity } from './report/types.js'
+import type { LoadedProfile } from './shapes/profile.js'
+import type { CrossCheckDocument } from './rdf/cross-checks.js'
 import type { Dataset } from 'rdf-ext'
 
 export interface DocumentInput {

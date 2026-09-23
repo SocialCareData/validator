@@ -5,7 +5,7 @@
 import SHACLValidator from 'rdf-validate-shacl'
 import type { ValidationReport } from 'rdf-validate-shacl'
 import type { Dataset } from 'rdf-ext'
-import { rdf } from './rdf.js'
+import { rdf } from './parse.js'
 
 const SH = 'http://www.w3.org/ns/shacl#'
 
