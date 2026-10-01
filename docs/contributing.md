@@ -122,8 +122,9 @@ may import `node:` builtins; everything else has to run in a browser.
 1. Add an entry to `src/shapes/catalogue.ts` — shape files, context, and any
    cross-record checks. If it should appear in the web picker, add a line to
    `web/src/descriptions.ts` too.
-2. Put examples under `examples/<name>/`, named `valid-*.jsonld` and
-   `invalid-*.jsonld`.
+2. Put examples under `examples/<name>/`: `valid-<name>.jsonld` with only the
+   required properties, `valid-<name>-full.jsonld` with all of them, and one
+   `invalid-*.jsonld` per defect. See [examples/README.md](../examples/README.md).
 3. Run `npm run test:conformance`. The suite discovers the new folder
    automatically.
 4. Regenerate `examples/<name>/expectations.json` and **read it**. See below.

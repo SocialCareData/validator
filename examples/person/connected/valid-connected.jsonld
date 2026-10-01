@@ -4,6 +4,6 @@
   "@type": "Person",
 
   "name": [
-    { "@type": "Name", "familyName": ["Doe"], "givenName": ["Mary"], "use": "usual" }
+    { "@type": "Name", "familyName": ["Doe"], "givenName": ["Mary"] }
   ]
 }

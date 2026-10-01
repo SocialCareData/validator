@@ -1,0 +1,179 @@
+{
+  "@context": "../context.jsonld",
+  "@graph": [
+    {
+      "@id": "ex:org-anytown-la",
+      "@type": "Organisation",
+      "identifier": [
+        { "@type": "Identifier", "value": "12345678", "system": "https://identifiers.company-information.service.gov.uk/company-number" }
+      ],
+      "name": "Anytown Metropolitan Borough Council",
+      "alias": ["Anytown Council"],
+      "type": ["local-authority"],
+      "active": true,
+      "address": [
+        { "@type": "Address", "line1": "1 High Street", "line2": "Civic Centre", "city": "Anytown", "postcode": "AB1 2CD", "UPRN": "100012345678", "USRN": "12345678", "use": "work" }
+      ],
+      "contact": [
+        { "@type": "Contact", "name": "Main", "email": ["contact@example.org"], "telephone": ["+44 7946 0000"] }
+      ],
+      "relatedProfessional": [
+        { "@type": "Identifier", "value": "PRF-001", "system": "https://example.org/Id/professional" }
+      ],
+      "relatedService": [
+        { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+      ]
+    },
+    {
+      "@id": "ex:svc-001",
+      "@type": "Service",
+      "identifier": [
+        { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+      ],
+      "name": "Children's Social Care - Referral & Assessment",
+      "alias": ["Front Door"],
+      "type": ["social-worker-support"],
+      "active": true,
+      "address": [
+        { "@type": "Address", "line1": "2 High Street", "city": "Anytown", "postcode": "AB1 2CE", "use": "work" }
+      ],
+      "contact": [
+        { "@type": "Contact", "name": "Duty Desk", "email": ["contact@example.org"], "telephone": ["+44 7946 0000"] }
+      ],
+      "costFrequency": "none",
+      "delivery": ["community"],
+      "relatedOrganisation": [
+        { "@type": "Identifier", "value": "12345678", "system": "https://example.org/Id/example-organisation" }
+      ],
+      "relatedProfessional": [
+        { "@type": "Identifier", "value": "PRF-001", "system": "https://example.org/Id/professional" }
+      ]
+    },
+    {
+      "@id": "ex:prf-001",
+      "@type": "Professional",
+      "identifier": [
+        { "@type": "Identifier", "value": "SW1234567", "system": "https://example.org/Id/registration" }
+      ],
+      "name": {
+        "@type": "Name",
+        "familyName": ["Doe"],
+        "givenName": ["Jane", "Elizabeth"],
+        "preferredName": "Janie",
+        "use": "official"
+      },
+      "role": ["Social Worker", "Team Lead - Referral & Assessment"],
+      "status": true,
+      "contact": {
+        "@type": "Contact",
+        "name": "Work",
+        "email": ["jane.doe@example.org"],
+        "telephone": ["+44 7946 0000"]
+      },
+      "relatedService": [
+        { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+      ],
+      "relatedOrganisation": [
+        { "@type": "Identifier", "value": "12345678", "system": "https://example.org/Id/example-organisation" }
+      ]
+    },
+    {
+      "@id": "ex:ep-2026-0001",
+      "@type": "ServiceEpisode",
+      "identifier": [
+        { "@type": "Identifier", "value": "EP-2026-0001", "system": "https://example.org/Id/episode" }
+      ],
+      "type": ["cin-plan"],
+      "subjectPerson": [
+        {
+          "@type": "SubjectPerson",
+          "person": { "@type": "Identifier", "value": "9434765919", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+          "involvement": "SBJ"
+        }
+      ],
+      "relatedProfessional": [
+        {
+          "@type": "RelatedProfessional",
+          "professional": { "@type": "Identifier", "value": "SW1234567", "system": "https://example.org/Id/registration" },
+          "involvement": "PPRF"
+        }
+      ],
+      "relatedService": [
+        { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+      ],
+      "timeInformation": [
+        {
+          "@type": "TimeInformation",
+          "startDateTime": "2026-05-01T09:30:00Z",
+          "endDateTime": "2026-05-01T11:00:00Z",
+          "frequency": {
+            "repeat": {
+              "dayOfWeek": ["tue"],
+              "frequency": 1,
+              "period": 1,
+              "periodUnit": "wk"
+            }
+          }
+        }
+      ],
+      "location": ["Anytown Family Centre"],
+      "finding": [
+        {
+          "@type": "Finding",
+          "observation": [
+            {
+              "@type": "Observation",
+              "type": "NEET",
+              "startDate": "2026-03-15T13:02:00",
+              "endDate": "2026-06-30T10:20:00"
+            },
+            {
+              "@type": "Observation",
+              "type": "SEND.SpLD",
+              "startDate": "2026-03-15T13:02:00"
+            }
+          ],
+          "measurement": [
+            {
+              "@type": "Measurement",
+              "value": 12,
+              "unit": "count",
+              "type": "Authorised Absences"
+            }
+          ],
+          "text": ["Home environment observed to be stable and supportive."]
+        }
+      ],
+      "outcome": "continuation"
+    },
+    {
+      "@id": "ex:le-2026-0007",
+      "@type": "LifeEvent",
+      "identifier": [
+        { "@type": "Identifier", "value": "LE-2026-0007", "system": "https://example.org/Id/life-event" }
+      ],
+      "type": ["missing-person"],
+      "subjectPerson": [
+        {
+          "@type": "SubjectPerson",
+          "person": { "@type": "Identifier", "value": "9434765919", "system": "https://fhir.nhs.uk/Id/nhs-number" },
+          "involvement": "SBJ"
+        }
+      ],
+      "relatedProfessional": [
+        {
+          "@type": "RelatedProfessional",
+          "professional": { "@type": "Identifier", "value": "SW1234567", "system": "https://example.org/Id/registration" },
+          "involvement": "PPRF"
+        }
+      ],
+      "relatedService": [
+        { "@type": "Identifier", "value": "SVC-001", "system": "https://example.org/Id/service" }
+      ],
+      "timeInformation": [
+        { "@type": "TimeInformation", "startDateTime": "2026-05-01T09:30:00Z" }
+      ],
+      "location": ["Anytown town centre"]
+    }
+  ]
+}

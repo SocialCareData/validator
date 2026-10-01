@@ -51,12 +51,12 @@
     { "@type": "Identifier", "value": "EDU-987654", "system": "https://example.org/Id/lea-code" }
   ],
 
-  "aboutMe": "What is most important to me: I want to remain independent in my home. People who are important to me: My daughter Sarah. My routines: I like having breakfast at 8am.",
+  "aboutMe": { "@type": "Identifier", "value": "ABOUTME-9002345678", "system": "https://example.org/Id/about-me" },
 
   "communication": [
     {
       "@type": "Communication",
-      "communicationNeeds": "Requires British Sign Language (BSL) interpreter for assessments.",
+      "specialCommunicationNeeds": "Requires British Sign Language (BSL) interpreter for assessments.",
       "language": [
         { "@type": "Language", "languageCode": "bsl", "proficiencyLevel": "native" },
         { "@type": "Language", "languageCode": "en", "proficiencyLevel": "fluent" }

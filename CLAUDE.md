@@ -49,15 +49,21 @@ different standards.
 
 ## The conformance suite
 
-`examples/` holds 49 records moved here from SocialCareData/standard, and they
-are the test suite: `valid-*` must conform, `invalid-*` must not.
+`examples/` holds 44 records, and they are the test suite: `valid-*` must
+conform, `invalid-*` must not. Each folder has exactly two valid records:
+`valid-<name>.jsonld` with only the required properties and
+`valid-<name>-full.jsonld` with every property the shape defines. Standards with
+several record types (safeguarding, assessments-and-plans) hold one node per
+type in a top-level `@graph`.
 `examples/<module>/expectations.json` additionally pins the issue code and JSON
 path each invalid example should produce, so a regression in wording fails the
 build.
 
-Those 49 verdicts match a baseline captured from the original `validate.js`
-before any of this was moved. **If a change flips one, that is a regression, not
-an improvement** — find out why before going further.
+The 34 invalid verdicts match a baseline captured from the original
+`validate.js` before any of this was moved; the valid pairs replaced 15 original
+valid records and were checked to exercise every property they did. **If a
+change flips a verdict, that is a regression, not an improvement** — find out
+why before going further.
 
 ## Conventions
 

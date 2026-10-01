@@ -47,6 +47,12 @@ spanning several records.
 conformance suite discovers the folder automatically; `valid-*` must conform and
 `invalid-*` must not.
 
+Write exactly two valid examples: `valid-<name>.jsonld` with only the required
+properties, and `valid-<name>-full.jsonld` giving every shape property a value.
+If the standard has several record types, put one node per type in a top-level
+`@graph`. Keys the context does not define are dropped without a word, so
+confirm every property of the full example reaches the RDF.
+
 Give each invalid example exactly one defect where you can, named after it
 (`invalid-bad-postcode.jsonld`). Examples that fail for several unrelated
 reasons still pass the suite but stop documenting anything.
