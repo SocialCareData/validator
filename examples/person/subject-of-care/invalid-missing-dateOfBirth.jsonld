@@ -1,5 +1,5 @@
 {
-  "@context": "../../context.jsonld",
+  "@context": "https://github.com/SocialCareData/ontology/releases/latest/download/context.jsonld",
   "@id": "ex:person-9004567890",
   "@type": "Person",
 

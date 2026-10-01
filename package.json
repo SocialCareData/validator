@@ -56,7 +56,8 @@
     "test:web": "vitest run test/web.test.ts",
     "test:conformance": "vitest run test/conformance.test.ts",
     "prepublishOnly": "npm run build",
-    "expectations": "npm run build && node scripts/update-expectations.mjs"
+    "expectations": "npm run build && node scripts/update-expectations.mjs",
+    "validate:examples": "npm run build && node scripts/validate-examples.mjs"
   },
   "dependencies": {
     "commander": "^12.1.0",

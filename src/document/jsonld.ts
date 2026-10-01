@@ -1,9 +1,8 @@
 /*
  * Deciding which @context a document is read with, then getting it into RDF.
  *
- * The examples in this package declare relative contexts
- * (`"@context": "../context.jsonld"`) inherited from where they used to live,
- * and users' files may name a context we have no copy of. Rather than rewrite
+ * The examples in this package name the ontology's released combined context
+ * by URL, and users' files may name a context we have no copy of. Rather than rewrite
  * files or fetch arbitrary URLs, there is one rule: an inline context is used
  * as written, and anything else falls back to the selected profile's published
  * context - which is the one that matches the shapes being validated against.

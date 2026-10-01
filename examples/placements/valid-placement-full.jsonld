@@ -1,5 +1,5 @@
 {
-  "@context": "../context.jsonld",
+  "@context": "https://github.com/SocialCareData/ontology/releases/latest/download/context.jsonld",
   "@id": "ex:ABCD2012-001",
   "@type": "Placement",
 

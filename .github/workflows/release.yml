@@ -1,9 +1,5 @@
 name: Publish to npm
 
-# Cutting a GitHub Release publishes the package. The tag must match the
-# version in package.json - a mismatch means the release notes describe
-# something other than what gets published, so it fails loudly instead.
-
 on:
   release:
     types: [published]
@@ -11,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  # Required for npm provenance: the registry verifies this workflow built the
-  # package, via a signed Sigstore attestation.
   id-token: write
 
 jobs:
@@ -40,8 +34,6 @@ jobs:
             exit 1
           fi
 
-      # Deliberately src only: `typecheck`, `test` and `build` all exclude the
-      # web app, which is deployed to GitHub Pages and never published to npm.
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
@@ -49,7 +41,4 @@ jobs:
       - name: Publish
         run: npm publish --provenance --access public
         env:
-          # Prefer npm trusted publishing (configured on npmjs.com against this
-          # repository and workflow), which needs no secret at all. This token
-          # is the fallback for accounts that have not enabled it.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

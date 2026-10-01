@@ -36,7 +36,8 @@ build rather than passing quietly.
 npm run test:conformance
 ```
 
-Each file declares a relative `@context` inherited from its original home. That
-path no longer resolves and is not meant to — the validator substitutes the
-profile's published context, which is the same behaviour anyone gets when
-validating a file that references a context we do not have.
+Each file declares the ontology's released combined context,
+`https://github.com/SocialCareData/ontology/releases/latest/download/context.jsonld`,
+so it resolves for any JSON-LD processor. The validator itself never fetches a
+document's context: it substitutes the profile's published context, the one
+matching the shapes, and reports `substituted-context`.

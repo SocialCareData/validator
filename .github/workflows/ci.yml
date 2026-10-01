@@ -4,12 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-  # The conformance suite runs against the ontology repo's `main`, which moves
-  # independently of this repo. A nightly run catches upstream drift before a
-  # user does, and is what replaces the publish gate that used to live in
-  # SocialCareData/standard.
-  schedule:
-    - cron: '17 6 * * *'
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -38,7 +33,6 @@ jobs:
       - run: npm test
       - run: npm run build
 
-      # A published package that cannot be installed is worse than no package.
       - name: Install the tarball elsewhere and run it
         run: |
           tarball="$(npm pack --silent)"
@@ -50,7 +44,9 @@ jobs:
           ./node_modules/.bin/scd-validate -p person:subject-of-care \
             "$GITHUB_WORKSPACE/examples/person/subject-of-care/valid-subject-of-care.jsonld"
 
-  # The GitHub Pages app. Never shipped to npm.
+      - name: Validate every example with the installed CLI
+        run: node scripts/validate-examples.mjs "$RUNNER_TEMP/smoke/node_modules/.bin/scd-validate"
+
   web:
     runs-on: ubuntu-latest
     steps:
