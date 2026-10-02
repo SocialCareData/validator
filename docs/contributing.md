@@ -2,11 +2,16 @@
 
 ```bash
 npm install
-npm run typecheck           # src only - what gets published
-npm test                    # unit, conformance, integrity, cross-record, structure
+npm run typecheck           # src/, test/ and scripts/
+npm test                    # conformance, integrity, cross-record
 ```
 
 Tests fetch real shapes from the ontology repository, so they need a network.
+
+The validation engine is [@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator), in its own
+repository. Wording, skolemization, the report format and the formatters are
+changed there. This repo holds what is specific to Social Care, plus the
+conformance suite that keeps the engine honest against real standards.
 
 ## Running the web app locally
 
@@ -18,9 +23,10 @@ Then open **<http://localhost:5173/validator/>**. Mind the `/validator/` — the
 app is built with that base path because it is served from
 `socialcaredata.github.io/validator/`, and the bare `/` just redirects there.
 
-Vite reloads on save, and that includes `src/`: the page imports the library
-source directly rather than the built `dist/`, so a change to a message or a
-shape-fact is on screen as soon as you save it. No `npm run build` in the loop.
+Vite reloads on save, including changes to `src/`. To try an engine change on
+the page before it is released, link a local checkout of the library:
+`npm install ../data-standard-validator`, then rebuild the library
+(`npm run build` there) after each change.
 
 To check the real production bundle - the thing GitHub Pages actually serves:
 
@@ -61,66 +67,33 @@ HEADED=1 SLOWMO=250 npm run test:web   # slowly enough to follow
 npx vitest run test/web.test.ts --reporter verbose
 ```
 
-`npm run typecheck:web` typechecks the app. It is deliberately separate from
-`npm run typecheck`, which covers only `src/` - what gets published.
+`npm run typecheck:web` typechecks the app, and `npm run typecheck` checks
+everything else.
 
 ## Layout
 
 ```
-src/        the published package - the library and the CLI
-web/        the GitHub Pages app - never published to npm
-examples/   the conformance fixtures
+src/            the Social Care layer, shared by the page and the tests
+  catalogue.ts    which profiles exist, and which files each one loads
+  cross-checks.ts constraints that span a whole set of records
+  patterns.ts     plain-English names for the regexes the shapes use
+  profile.ts      a profile, loaded into a ready validator (memoised)
+web/            the GitHub Pages app
+examples/       the conformance suite
+scripts/        update-expectations.ts
+test/           conformance, integrity, cross-checks, web
 ```
 
-`src/` is laid out as the path a record takes through the tool:
-
-```
-src/
-  index.ts            the public API
-  cli.ts              the command line
-  validator.ts        the pipeline that ties the four stages together
-
-  shapes/             1. where the shapes come from
-    catalogue.ts        which profiles exist, and which files each one loads
-    fetch.ts            fetching a text file over HTTPS
-    profile.ts          a profile, loaded and ready to validate against
-
-  document/           2. the user's JSON, on its way to RDF - and back
-    skolemize.ts        naming anonymous nodes; locating pointers in the source
-    context.ts          reading a JSON-LD context backwards
-    jsonld.ts           choosing a context, and converting to RDF
-
-  rdf/                3. the RDF layer
-    parse.ts            Turtle and N-Quads into a dataset
-    shacl.ts            the engine, and the guard skolemization depends on
-    cross-checks.ts     constraints that span a whole set of records
-
-  report/             4. results, in English
-    types.ts            the report contract
-    shape-facts.ts      reading constraints back off the shape that raised them
-    messages.ts         a constraint, as a sentence
-    build.ts            SHACL results -> issues, and grouping them
-    pretty.ts           terminal output
-
-  types/vendor.d.ts   ambient declarations for the untyped RDF stack
-```
-
-That reading order is the pipeline, not the dependency order. Imports form a DAG
-with no cycles, and it runs the other way: `rdf/` depends on nothing else here,
-`document/` builds on `rdf/`, `report/` builds on both, and `shapes/` uses all
-three to assemble a profile. `validator.ts` is the only module that reaches into
-every folder. `test/architecture.test.ts` checks this, so a new import that
-breaks it fails the build rather than quietly eroding the structure.
-
-**Two rules about the split.** `src/` is what gets published, so nothing that
-exists only for the web page belongs there — the profile descriptions in the
-`<select>`, for instance, live in `web/src/descriptions.ts`. And only `cli.ts`
-may import `node:` builtins; everything else has to run in a browser.
+`src/catalogue.ts` deliberately imports nothing from the engine. The page's
+main thread imports it to fill the profile picker, and keeping the RDF stack
+out of it keeps that bundle small. The validator itself only ever loads in the
+worker. Profile descriptions for the `<select>` live in
+`web/src/descriptions.ts`.
 
 ## Adding a profile
 
-1. Add an entry to `src/shapes/catalogue.ts` — shape files, context, and any
-   cross-record checks. If it should appear in the web picker, add a line to
+1. Add an entry to `src/catalogue.ts`: shape files, context, and any
+   cross-record checks (by name, from `src/cross-checks.ts`). If it should appear in the web picker, add a line to
    `web/src/descriptions.ts` too.
 2. Put examples under `examples/<name>/`: `valid-<name>.jsonld` with only the
    required properties, `valid-<name>-full.jsonld` with all of them, and one
@@ -147,34 +120,32 @@ files assert *what it says*, which is the part users read — so a change that
 quietly degrades a message into "other", or that points at the wrong field, fails
 the build.
 
-Generate them from a run, then review them by hand. A generated expectation that
+Generate them with `npm run expectations`, then review them by hand. A generated expectation that
 nobody has read is just a record of current behaviour, including its bugs.
 
 ## Adding a plain-English message
 
-`src/report/messages.ts` maps SHACL constraint components to sentences. Add a case
-there, a test in `test/unit/messages.test.ts`, and a section in
-`docs/error-reference.md` — the code is a documented interface.
+Messages are built by the engine, in
+[`src/report/messages.ts`](https://github.com/theodi/data-standard-validator/blob/main/src/report/messages.ts) of the library
+repository. Change them there, with a test and an entry in its
+`docs/error-reference.md`.
 
-Two rules for the wording:
+The one thing that stays here is `src/patterns.ts`. It holds names for the
+regexes the Social Care shapes use, such as "a UK postcode in upper case, with
+an optional space". Add an entry when a new `sh:pattern` reads badly.
 
-- **No IRIs in the human layer.** A test enforces this. IRIs go in `technical`.
-- **Say what would be right**, not only what is wrong. "must be one of: home,
-  work, temp" beats "value not allowed".
+After any wording change, run `npm run expectations && git diff examples/`.
+The pinned codes and paths should not move.
 
-## Releasing
+## Deploying
 
-1. Update the version in `package.json` and open a pull request.
-2. Once merged, create a GitHub Release tagged `vX.Y.Z`.
-3. `release.yml` checks the tag matches `package.json`, runs the src-only
-   test suite, builds and publishes to npm with provenance. The web app is not
-   built or shipped.
+Nothing here is published to npm. `pages.yml` builds `web/` and deploys it to
+GitHub Pages on every push to `main` that touches the app, `src/` or the
+examples. It needs Settings → Pages → Source: **GitHub Actions**, once.
 
-Publishing needs the `@socialcaredata` scope on npm and this repository allowed
-to publish to it; prefer
-[trusted publishing](https://docs.npmjs.com/trusted-publishers), which needs no
-secret. GitHub Pages needs Settings → Pages → Source: **GitHub Actions**, once.
+To pick up a new engine release, bump `@theodi/data-standard-validator` in
+`package.json`. Then run `npm test` and `npm run test:web`. A flipped verdict
+in the conformance suite is a regression in the engine, not an improvement.
 
 When the ontology repo cuts its first tag, change `DEFAULT_REF` in
-`src/shapes/catalogue.ts` from `main` to that tag, run `npm run test:conformance`, and
-release.
+`src/catalogue.ts` from `main` to that tag, and run `npm run test:conformance`.

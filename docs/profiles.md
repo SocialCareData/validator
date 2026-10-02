@@ -13,8 +13,8 @@ their fields, plus any checks that span a whole set of records.
 
 Each also loads `<module>/context.jsonld` from the same place.
 
-`scd-validate --help` lists them; `--json` on a run reports the exact URLs that
-were loaded.
+They are defined in [`src/catalogue.ts`](../src/catalogue.ts). Every report's
+`setup.shapes` lists the exact URLs that were loaded.
 
 ## Why Person has two profiles
 
@@ -31,7 +31,7 @@ person against the subject-of-care shape will produce a page of spurious
 https://raw.githubusercontent.com/SocialCareData/ontology/<ref>/<module>/<file>
 ```
 
-`<ref>` is `--ref`, defaulting to `main`. The files there are generated from the
+`<ref>` is set under **Advanced** on the page, and defaults to `main`. The files there are generated from the
 LinkML schemas in
 [SocialCareData/standard](https://github.com/SocialCareData/standard) — never
 hand-edited — and this tool holds URLs rather than copies, so a release of the
@@ -40,14 +40,20 @@ validator can never ship a shape that disagrees with the published standard.
 ## Pinning
 
 `main` moves. For anything repeatable — CI, a published pipeline, an audit — pin
-to a tag:
+to a tag.
+
+On the page, set the ref under **Advanced**. On the command line, put the tag
+in the URL:
 
 ```bash
-scd-validate -p placements --ref v2026.1.0 data/*.jsonld
+npx @theodi/data-standard-validator \
+  -s https://raw.githubusercontent.com/SocialCareData/ontology/v2026.1.0/placements/placements-standard-shape.ttl \
+  -c https://raw.githubusercontent.com/SocialCareData/ontology/v2026.1.0/placements/context.jsonld \
+  data/*.jsonld
 ```
 
-Shapes are fetched fresh on each run - two or three small files - and held in
-memory for the life of the process.
+The page fetches the shapes once per profile and ref, and keeps them for as
+long as the tab is open.
 
 ## The placements rules shape
 
@@ -61,6 +67,6 @@ than failing. The rest of the checks are unaffected.
 
 ## Adding a profile
 
-Add an entry to `src/shapes/catalogue.ts`, put its examples under `examples/<name>/`
+Add an entry to `src/catalogue.ts`, put its examples under `examples/<name>/`
 following the `valid-*` / `invalid-*` convention, and the conformance suite will
 pick them up automatically. See [contributing](contributing.md).

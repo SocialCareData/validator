@@ -1,10 +1,10 @@
 /*
- * Which shapes exist, and where they live.
+ * Which Social Care standards exist, and where their shapes live.
  *
  * Shapes are never bundled. They are generated from the LinkML schemas in
  * SocialCareData/standard and published to SocialCareData/ontology, and this
- * package holds URLs into that repository rather than copies - so a release can
- * never ship a shape that disagrees with the published standard.
+ * repo holds URLs into that repository rather than copies - so the page can
+ * never check against a shape that disagrees with the published standard.
  */
 
 export const ONTOLOGY_REPO = 'SocialCareData/ontology'
@@ -28,9 +28,12 @@ export interface Profile {
   shapes: ShapeRef[]
   /** JSON-LD context, in the same repo. */
   context: string
-  /** Names from CROSS_CHECKS. */
+  /**
+   * Names from CROSS_CHECKS. Names rather than the checks themselves keep this
+   * file free of the RDF stack, so the page's main thread can import it.
+   */
   crossChecks: string[]
-  /** Folder of bundled examples, relative to the package root. */
+  /** Folder of examples, relative to the repo root. */
   examples: string
 }
 

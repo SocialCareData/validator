@@ -24,7 +24,7 @@ failing the run. The placements rules shape is the worked example.
 
 ## 2. Add the catalogue entry
 
-`src/shapes/catalogue.ts`. Shapes merge into one dataset in the order listed.
+`src/catalogue.ts`. Shapes merge into one dataset in the order listed.
 
 ```ts
 {
@@ -37,9 +37,13 @@ failing the run. The placements rules shape is the worked example.
 }
 ```
 
-`crossChecks` names entries in `CROSS_CHECKS` (`src/rdf/cross-checks.ts`) — use
-it only for constraints SHACL Core genuinely cannot express, which means those
-spanning several records.
+`crossChecks` names entries in `CROSS_CHECKS` (`src/cross-checks.ts`). Use it
+only for constraints SHACL Core genuinely cannot express, which means those
+spanning several records. They are names, not imports, because the catalogue
+must stay free of the RDF stack (see CLAUDE.md).
+
+If the new shapes use an `sh:pattern` that reads badly as its description,
+add a `PatternHint` to `src/patterns.ts`.
 
 ## 3. Add examples
 
@@ -57,8 +61,8 @@ Give each invalid example exactly one defect where you can, named after it
 (`invalid-bad-postcode.jsonld`). Examples that fail for several unrelated
 reasons still pass the suite but stop documenting anything.
 
-A relative `@context` is fine and does not need rewriting — the loader
-substitutes the profile's published context and says so.
+A relative `@context` is fine and does not need rewriting. The profile's
+published context always replaces it, and the report says so.
 
 ## 4. Pin the expectations
 
@@ -76,7 +80,7 @@ as `other` means the constraint has no plain-English wording yet — see the
 
 If it should appear in the browser app, add a one-sentence entry to
 `web/src/descriptions.ts`. It lives there rather than in the catalogue because
-`src/` is the published package and a `<select>` blurb has no business in it.
+a `<select>` blurb is page copy, not data about the standard.
 
 ## 6. Verify
 

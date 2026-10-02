@@ -13,9 +13,9 @@ import { describe, expect, test, beforeAll } from 'vitest'
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { profiles } from '../src/shapes/catalogue.js'
-import { loadProfile, type LoadedProfile } from '../src/shapes/profile.js'
-import { createValidator } from '../src/validator.js'
+import type { Validator } from '@theodi/data-standard-validator'
+import { profiles } from '../src/catalogue.js'
+import { profileValidator } from '../src/profile.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -23,10 +23,10 @@ interface Expectation { code: string, jsonPath: string }
 
 for (const entry of profiles) {
   describe(entry.id, () => {
-    let profile: LoadedProfile
+    let validator: Validator
 
     beforeAll(async () => {
-      profile = await loadProfile(entry.id)
+      validator = await profileValidator(entry.id)
     })
 
     const dir = join(root, entry.examples)
@@ -43,7 +43,6 @@ for (const entry of profiles) {
 
     test.each(files)('%s', async (file) => {
       const shouldConform = file.startsWith('valid-')
-      const validator = createValidator(profile)
       const report = await validator.validate({
         name: file,
         text: readFileSync(join(dir, file), 'utf8'),

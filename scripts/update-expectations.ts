@@ -11,14 +11,15 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { profiles, loadProfile, createValidator } from '../dist/index.js'
+import { profiles } from '../src/catalogue.js'
+import { profileValidator } from '../src/profile.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 for (const profile of profiles) {
-  const validator = createValidator(await loadProfile(profile.id))
+  const validator = await profileValidator(profile.id)
   const dir = join(root, profile.examples)
-  const expectations = {}
+  const expectations: Record<string, { code: string, jsonPath: string }[]> = {}
 
   for (const file of readdirSync(dir).filter((f) => f.endsWith('.jsonld')).sort()) {
     if (file.startsWith('valid-')) continue

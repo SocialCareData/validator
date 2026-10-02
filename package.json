@@ -1,7 +1,8 @@
 {
   "name": "@socialcaredata/validator",
   "version": "0.1.0",
-  "description": "Validate social care data against the published Social Care MAIS SHACL shapes, from the command line or the browser.",
+  "private": true,
+  "description": "Validate social care data against the published Social Care MAIS SHACL shapes in the browser. Built on @theodi/data-standard-validator.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -15,38 +16,10 @@
   "bugs": {
     "url": "https://github.com/SocialCareData/validator/issues"
   },
-  "keywords": [
-    "shacl",
-    "json-ld",
-    "rdf",
-    "validation",
-    "social-care",
-    "linkml"
-  ],
-  "bin": {
-    "scd-validate": "./dist/cli.js"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
   "sideEffects": [
     "./web/src/worker-globals.ts"
   ],
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "build:web": "vite build --config web/vite.config.ts",
     "dev:web": "vite --config web/vite.config.ts",
     "preview": "vite preview --config web/vite.config.ts",
@@ -55,25 +28,17 @@
     "test": "vitest run --exclude '**/web.test.ts' --exclude '**/node_modules/**'",
     "test:web": "vitest run test/web.test.ts",
     "test:conformance": "vitest run test/conformance.test.ts",
-    "prepublishOnly": "npm run build",
-    "expectations": "npm run build && node scripts/update-expectations.mjs",
-    "validate:examples": "npm run build && node scripts/validate-examples.mjs"
+    "expectations": "vite-node scripts/update-expectations.ts"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "jsonc-parser": "^3.3.1",
-    "jsonld": "^8.3.2",
-    "n3": "^1.17.4",
-    "picocolors": "^1.1.1",
-    "rdf-ext": "^2.5.1",
-    "rdf-validate-shacl": "^0.5.5"
+    "@theodi/data-standard-validator": "file:../data-standard-validator"
   },
   "devDependencies": {
-    "@rdfjs/types": "^1.1.2",
     "@types/node": "^22.10.0",
     "playwright": "^1.55.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.0",
+    "vite-node": "^2.1.8",
     "vitest": "^2.1.8"
   }
 }

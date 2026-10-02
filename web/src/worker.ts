@@ -8,9 +8,8 @@
 // Side-effect import, and it has to come first - see the file for why.
 import './worker-globals.js'
 
-import { loadProfile } from '@validator/shapes/profile.js'
-import { createValidator } from '@validator/validator.js'
-import type { RunReport } from '@validator/report/types.js'
+import type { RunReport } from '@theodi/data-standard-validator'
+import { profileValidator } from '@validator/profile.js'
 
 export interface ValidateRequest {
   kind: 'validate'
@@ -26,7 +25,7 @@ export type WorkerResponse =
   | { kind: 'result', id: number, report: RunReport }
   | { kind: 'error', id: number, message: string }
 
-// loadProfile memoises per profile+ref for the life of the worker, so the
+// profileValidator memoises per profile+ref for the life of the worker, so the
 // shapes are fetched and parsed once however often somebody presses Validate.
 const seen = new Set<string>()
 
@@ -41,9 +40,8 @@ self.addEventListener('message', (event: MessageEvent<ValidateRequest>) => {
         post({ kind: 'status', id: request.id, message: `Fetching shapes for ${request.ref}...` })
         seen.add(key)
       }
-      const profile = await loadProfile(request.profileId, { ref: request.ref })
+      const validator = await profileValidator(request.profileId, { ref: request.ref })
       post({ kind: 'status', id: request.id, message: 'Validating...' })
-      const validator = createValidator(profile)
       const report = await validator.validateAll([{ name: request.name, text: request.text }])
       post({ kind: 'result', id: request.id, report })
     } catch (error) {

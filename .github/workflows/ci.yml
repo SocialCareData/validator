@@ -15,37 +15,24 @@ permissions:
   contents: read
 
 jobs:
-  # The published package: src only, no web.
-  package:
+  # The Social Care layer and the conformance suite. The validation engine
+  # itself is @theodi/data-standard-validator, tested in its own repo.
+  conformance:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node: ['22', '24']
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node }}
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
-      - run: npm run build
 
-      - name: Install the tarball elsewhere and run it
+      - name: Pinned expectations still match
         run: |
-          tarball="$(npm pack --silent)"
-          mkdir -p "$RUNNER_TEMP/smoke"
-          cd "$RUNNER_TEMP/smoke"
-          npm init -y >/dev/null
-          npm install "$GITHUB_WORKSPACE/$tarball"
-          ./node_modules/.bin/scd-validate --help
-          ./node_modules/.bin/scd-validate -p person:subject-of-care \
-            "$GITHUB_WORKSPACE/examples/person/subject-of-care/valid-subject-of-care.jsonld"
-
-      - name: Validate every example with the installed CLI
-        run: node scripts/validate-examples.mjs "$RUNNER_TEMP/smoke/node_modules/.bin/scd-validate"
+          npm run expectations
+          git diff --exit-code examples/
 
   web:
     runs-on: ubuntu-latest

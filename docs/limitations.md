@@ -21,7 +21,7 @@ Specifically:
 ## Validation
 
 - **`sh:nodeKind sh:BlankNode` disables path tracing.** No current shape uses it.
-  If one ever does, `loadProfile` notices, turns skolemization off, warns, and
+  If one ever does, the validator notices, turns skolemization off, warns, and
   falls back to reporting the nearest `@id`.
 - **Cross-record checks only see the records in one command.** Validating a
   thousand files one at a time will never find a duplicate `childId`.
@@ -33,15 +33,16 @@ Specifically:
 ## Shapes
 
 - **`main` moves.** The default ref tracks the latest published shapes, so the same
-  validator version can give different answers on different days. Pin with
-  `--ref` for anything repeatable.
+  validator version can give different answers on different days. Pin a tag
+  under **Advanced** (or in the shape URLs on the command line) for anything
+  repeatable.
 - **A mutable ref is not tamper-evident.** There is no integrity check on fetched
   shapes beyond HTTPS.
-- **A `@context` named by path or URL is not fetched.** The profile's published
-  context is used instead and an informational issue says so. Inline the context
-  in the document if you need your own to be used as written.
-- **Shapes are fetched on every run.** Two or three small files, so this is
-  ordinarily unnoticeable, but it does mean the CLI needs a network.
+- **A document's own `@context` is always replaced.** The page reads every record
+  with the profile's published context, the one matching the shapes, and an
+  informational issue says so.
+- **Shapes are fetched at run time.** They are two or three small files, so this
+  is normally unnoticeable, but it does mean the page needs a network.
 
 ## Reporting
 

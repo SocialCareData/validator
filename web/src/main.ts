@@ -3,9 +3,8 @@
  * renders the report, and keeps the gutter and colouring in step with the textarea.
  */
 
-import { profiles, getProfile, DEFAULT_REF } from '@validator/shapes/catalogue.js'
-import { groupIssues } from '@validator/report/build.js'
-import type { Issue, RunReport, Severity } from '@validator/report/types.js'
+import { groupIssues, type Issue, type RunReport, type Severity } from '@theodi/data-standard-validator'
+import { profiles, getProfile, DEFAULT_REF } from '@validator/catalogue.js'
 import { DESCRIPTIONS } from './descriptions.js'
 import { highlightJson } from './highlight.js'
 import type { ValidateRequest, WorkerResponse } from './worker.js'
@@ -205,14 +204,17 @@ function banner (kind: 'warning' | 'info' | 'error', text: string): HTMLElement 
   return el('div', `banner ${kind}`, text)
 }
 
-function renderReport (report: RunReport): void {
+/** What was validated against: the report itself only knows shape URLs. */
+interface RunLabel { profile: string, ref: string }
+
+function renderReport (report: RunReport, label: RunLabel): void {
   results.replaceChildren()
   flaggedLines = new Set()
 
   const doc = report.documents[0]
   if (!doc) return
 
-  for (const warning of report.profile.warnings) {
+  for (const warning of report.setup.warnings) {
     results.append(banner('warning', `${warning.title}${warning.hint !== undefined ? ` ${warning.hint}` : ''}`))
   }
 
@@ -222,7 +224,7 @@ function renderReport (report: RunReport): void {
   verdict.append(el('strong', undefined, doc.conforms
     ? 'This record follows the standard'
     : `${problems} problem${problems === 1 ? '' : 's'} found`))
-  const parts = [`${report.profile.label ?? ''}`, `ref ${report.profile.ref}`]
+  const parts = [label.profile, `ref ${label.ref}`]
   if (warnings > 0) parts.push(`${warnings} warning${warnings === 1 ? '' : 's'}`)
   verdict.append(el('span', 'muted', parts.filter(Boolean).join('  ·  ')))
   results.append(verdict)
@@ -261,6 +263,8 @@ let requestId = 0
 // it vanish without a reply - which on the page looks like "Validating..."
 // forever. Remember the failure so every run can say so instead.
 let workerFailure: string | undefined
+// The profile and ref of the latest request, for the verdict line.
+let inFlight: RunLabel = { profile: '', ref: DEFAULT_REF }
 
 function showWorkerFailure (): void {
   validateButton.disabled = false
@@ -288,7 +292,7 @@ worker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
     results.replaceChildren(banner('error', `Could not validate: ${message.message}`))
     return
   }
-  renderReport(message.report)
+  renderReport(message.report, inFlight)
 })
 
 function run (): void {
@@ -309,11 +313,13 @@ function run (): void {
   validateButton.disabled = true
   validateButton.textContent = 'Validating…'
   requestId += 1
+  const ref = refInput.value.trim() || DEFAULT_REF
+  inFlight = { profile: getProfile(profileSelect.value)?.label ?? profileSelect.value, ref }
   const request: ValidateRequest = {
     kind: 'validate',
     id: requestId,
     profileId: profileSelect.value,
-    ref: refInput.value.trim() || DEFAULT_REF,
+    ref,
     text: input.value,
     name: 'your record',
   }

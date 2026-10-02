@@ -15,31 +15,44 @@ looks like before you are staring at one of your own.
 
 ## On the command line
 
-```bash
-npx @socialcaredata/validator -p person:subject-of-care mydata.jsonld
-```
-
-or install it once:
+The page is built on the generic
+[`dsv` validator](https://github.com/theodi/data-standard-validator), which runs anywhere Node 22+ does. Give it a profile's
+published shape (`-s`) and context (`-c`):
 
 ```bash
-npm install --global @socialcaredata/validator
-scd-validate -p person:subject-of-care mydata.jsonld
+ONT=https://raw.githubusercontent.com/SocialCareData/ontology/main
+npx @theodi/data-standard-validator \
+  -s $ONT/person/person-subject-of-care-shape.ttl \
+  -c $ONT/person/context.jsonld \
+  mydata.jsonld
 ```
 
-`scd-validate --help` lists the profiles.
+| Profile | `-s` (repeat for several) | `-c` |
+| --- | --- | --- |
+| `person:subject-of-care` | `person/person-subject-of-care-shape.ttl` | `person/context.jsonld` |
+| `person:connected` | `person/person-connected-shape.ttl` | `person/context.jsonld` |
+| `placements` | `placements/placements-standard-shape.ttl`, plus `placements/placements-base-rules-shape.ttl` once it is published | `placements/context.jsonld` |
+| `safeguarding` | `safeguarding/safeguarding-standard-shape.ttl` | `safeguarding/context.jsonld` |
+| `assessments-and-plans` | `assessments-and-plans/assessments-and-plans-standard-shape.ttl` | `assessments-and-plans/context.jsonld` |
 
-Several files at once — useful because some checks look across a whole set of
-records rather than one at a time:
+Each path is relative to `$ONT`. Replace `main` in `$ONT` with a tag to pin a
+version. The page treats the placements rules shape as optional and warns when
+it is missing. The command line treats every `-s` as required, so leave that
+one out until it is published.
+
+Pass several files at once. Every file in one command is validated together:
 
 ```bash
-scd-validate -p placements data/*.jsonld
+npx @theodi/data-standard-validator -s $ONT/placements/placements-standard-shape.ttl \
+  -c $ONT/placements/context.jsonld data/*.jsonld
 ```
 
-From a pipe:
-
-```bash
-jq '.records[0]' export.json | scd-validate -p safeguarding
-```
+Two things are specific to the web page and are not available on the command
+line. The duplicate-`childId` check across placements records lives in this
+repo's [`src/cross-checks.ts`](../src/cross-checks.ts). The plain-English
+description of the postcode regex lives in [`src/patterns.ts`](../src/patterns.ts).
+The command line still reports a bad postcode, using the shape's own
+description.
 
 ## Reading the output
 
@@ -50,35 +63,26 @@ mydata.jsonld -> fails
       at address[0].postcode  line 10
          10 |   "address": [ { "@type": "Address", "postcode": "NOT A POSTCODE" } ],
             |                                                  ^^^^^^^^^^^^^^^^
-      It should be a UK postcode in upper case, with an optional space, for example `AB1 2CD`.
+      It should be UK postcode in standard format, for example `AB1 2CD`.
 ```
 
-- **`in Address (address[0])`** — problems are grouped by the object they are in,
-  so you fix one part of the record at a time.
-- **`at address[0].postcode`** — the path to the exact field, in your JSON.
-- **the caret** — the offending value in your file.
-- **the last line** — what the standard expects, and an example.
+- **`in Address (address[0])`**: problems are grouped by the object they are
+  in, so you can fix one part of the record at a time.
+- **`at address[0].postcode`**: the path to the exact field in your JSON.
+- **The caret**: points at the offending value in your file.
+- **The last line**: what the standard expects, with an example.
 
-`--json` prints the whole report as JSON, including a `technical` block per issue
-carrying the focus node, shape and constraint component.
-
-## What the exit code means
-
-| Code | Meaning |
-| --- | --- |
-| `0` | Everything conforms |
-| `1` | Problems were found |
-| `2` | Bad usage, or a file could not be read |
-| `3` | Shapes could not be loaded — network, or a bad `--ref` |
-
-So `scd-validate -p placements data/*.jsonld && echo ok` does the right thing in a
-script.
+`-f json` prints the whole report as JSON, and `-f markdown` produces a report
+for GitHub job summaries. Exit codes are `0` when everything conforms, `1` when
+problems were found, `2` for bad usage, and `3` when a shape, context or file
+could not be loaded.
 
 ## Do I need JSON-LD?
 
-No. If your file has no `@context`, the validator uses the selected profile's
-published context, and tells you it did. Plain JSON whose field names match the
-standard will validate correctly.
+No. The page always reads your record with the selected profile's published
+context, and tells you it did. On the command line,
+`-c` does the same. Plain JSON whose field names match the standard will
+validate correctly.
 
 Adding `"@context": "https://raw.githubusercontent.com/SocialCareData/ontology/main/person/context.jsonld"`
 makes the file self-describing, which is worth doing if it will be passed around.

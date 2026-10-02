@@ -1,33 +1,9 @@
 /*
- * Constraints that hold across a whole set of records, which SHACL Core cannot
- * express at all - it validates one focus node at a time.
+ * Rules that hold across a whole set of Social Care records, which SHACL Core
+ * cannot express - it validates one focus node at a time.
  */
 
-import { rdf } from './parse.js'
-import type { Dataset } from 'rdf-ext'
-
-export interface CrossCheckDocument {
-  name: string
-  dataset: Dataset
-}
-
-export interface CrossCheckFinding {
-  message: string
-  documents: string[]
-}
-
-export interface CrossCheckResult {
-  id: string
-  title: string
-  ok: boolean
-  findings: CrossCheckFinding[]
-}
-
-export interface CrossCheck {
-  id: string
-  title: string
-  run(documents: CrossCheckDocument[]): CrossCheckResult
-}
+import { namedNode, type CrossCheck, type CrossCheckFinding } from '@theodi/data-standard-validator'
 
 /*
  * Flat namespace: every module shares https://ontology.socialcaredata.io/, so
@@ -41,7 +17,7 @@ export const duplicateChildId: CrossCheck = {
   id: 'duplicate-child-id',
   title: 'duplicate childId across the record set',
   run (documents) {
-    const predicate = rdf.namedNode(CHILD_ID)
+    const predicate = namedNode(CHILD_ID)
     const seen = new Map<string, string[]>()
     for (const { name, dataset } of documents) {
       for (const quad of dataset.match(null, predicate, null)) {
@@ -63,7 +39,7 @@ export const duplicateChildId: CrossCheck = {
         })
       }
     }
-    return { id: this.id, title: this.title, ok: findings.length === 0, findings }
+    return { ok: findings.length === 0, findings }
   },
 }
 
