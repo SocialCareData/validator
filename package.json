@@ -31,7 +31,7 @@
     "expectations": "vite-node scripts/update-expectations.ts"
   },
   "dependencies": {
-    "@theodi/data-standard-validator": "file:../data-standard-validator"
+    "@theodi/data-standard-validator": "github:theodi/data-standard-validator#main"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
