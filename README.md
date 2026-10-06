@@ -21,7 +21,7 @@ This repository holds:
 | `src/config.ts` | The five standards: their shape, context and example URLs, plus plain-English names for the regexes the shapes use |
 | `src/component/` | The validator UI as a generic component, configured by `src/config.ts`. Nothing in it is specific to Social Care |
 | `index.html`, `src/main.ts`, `src/site.css` | The GitHub Pages app: the Social Care header and footer around the component |
-| `examples/` | The conformance suite: 44 records that must pass or fail |
+| `test/` | The conformance suite, run against the 40 example records in [SocialCareData/ontology](https://github.com/SocialCareData/ontology/tree/main/examples), plus the issues each invalid one must report |
 
 Nothing here is published to npm.
 

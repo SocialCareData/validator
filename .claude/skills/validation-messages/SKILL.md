@@ -28,7 +28,7 @@ shape's `sh:description` and lifts the example out of any `(e.g. ...)`.
 
 ```bash
 (cd ../data-standard-validator && npm run build)   # only for an engine change
-npm run expectations && git diff examples/          # codes and paths must not move
+npm run expectations && git diff test/expectations/ # codes and paths must not move
 npm test
 npm run dev                                         # read it as a user would
 ```

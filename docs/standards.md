@@ -65,7 +65,7 @@ yet:
 
 ## Adding a standard
 
-Add an entry to `src/config.ts`, put its examples under `examples/<name>/`
-following the `valid-*` / `invalid-*` convention, and list the two `valid-*`
+Add an entry to `src/config.ts`, put its examples under `examples/<name>/` in
+SocialCareData/ontology following the `valid-*` / `invalid-*` convention, and list the two `valid-*`
 files in the entry. The conformance suite picks the folder up from those
 example URLs. See [contributing](contributing.md).

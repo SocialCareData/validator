@@ -1,5 +1,5 @@
 /*
- * Regenerate examples/<module>/expectations.json.
+ * Regenerate test/expectations/<module>.json.
  *
  * These files pin the issue code and JSON path every invalid example should
  * produce, which is what turns the conformance suite from "did it fail?" into
@@ -8,9 +8,9 @@
  * committing it.
  */
 
-import { readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { exampleFiles, examplesDir, standards, validatorFor } from '../test/helpers.js'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { exampleFiles, examplesDir, expectationsFile, standards, validatorFor } from '../test/helpers.js'
 
 for (const standard of standards) {
   const validator = await validatorFor(standard)
@@ -29,6 +29,8 @@ for (const standard of standards) {
       .sort((a, b) => (a.jsonPath + a.code).localeCompare(b.jsonPath + b.code))
   }
 
-  writeFileSync(join(dir, 'expectations.json'), `${JSON.stringify(expectations, null, 2)}\n`)
+  const file = expectationsFile(standard)
+  mkdirSync(dirname(file), { recursive: true })
+  writeFileSync(file, `${JSON.stringify(expectations, null, 2)}\n`)
   console.log(`${standard.name}: ${Object.keys(expectations).length} invalid example(s)`)
 }

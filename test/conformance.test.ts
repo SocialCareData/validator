@@ -2,9 +2,9 @@
  * The gate that used to live in SocialCareData/standard.
  *
  * Its ontology-sync workflow ran these same examples against freshly generated
- * shapes and refused to publish if any misbehaved. The examples now live here,
- * so the gate does too - with one addition: as well as asserting that
- * `valid-*` conforms and `invalid-*` does not, each invalid example pins the
+ * shapes and refused to publish if any misbehaved. The examples now live in
+ * SocialCareData/ontology and the gate lives here, with one addition: as well
+ * as asserting that `valid-*` conforms and `invalid-*` does not, each invalid example pins the
  * issue codes and JSON paths it should produce. That turns a pass/fail gate
  * into a regression test for the part people actually read.
  */
@@ -13,7 +13,7 @@ import { describe, expect, test, beforeAll } from 'vitest'
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Validator } from '@theodi/data-standard-validator'
-import { exampleFiles, examplesDir, standards, validatorFor } from './helpers.js'
+import { exampleFiles, examplesDir, expectationsFile, standards, validatorFor } from './helpers.js'
 
 interface Expectation { code: string, jsonPath: string }
 
@@ -32,7 +32,7 @@ for (const standard of standards) {
       expect(files.length).toBeGreaterThan(0)
     })
 
-    const expectationsPath = join(dir, 'expectations.json')
+    const expectationsPath = expectationsFile(standard)
     const expectations: Record<string, Expectation[]> = existsSync(expectationsPath)
       ? JSON.parse(readFileSync(expectationsPath, 'utf8')) as Record<string, Expectation[]>
       : {}

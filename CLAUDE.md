@@ -9,9 +9,9 @@ its own repository (locally `../data-standard-validator`). Nothing here is
 published to npm.
 
 ```bash
-npm test                # conformance, integrity, config - needs a network
+npm test                # conformance, integrity, config - needs a network and the ontology checkout
 npm run typecheck       # src/, test/, scripts/ - the app included
-npm run expectations    # regenerate examples/*/expectations.json - read the diff
+npm run expectations    # regenerate test/expectations/*.json - read the diff
 npm run dev             # http://localhost:5173/validator/  (mind the base path)
 npm run test:web        # real Chromium; `npx playwright install chromium` once
 ```
@@ -61,17 +61,23 @@ to both Person standards, which hold it to deliberately different rules.
 
 ## The conformance suite
 
-`examples/` holds 44 records, and they are the test suite: `valid-*` must
-conform, `invalid-*` must not. Each folder has exactly two valid records:
+The records live in `examples/` of
+[SocialCareData/ontology](https://github.com/SocialCareData/ontology), not
+here. The tests read a local checkout: `ONTOLOGY_DIR`, or `../ontology` beside
+this repo (CI checks out `main`). Its 40 records are the test suite: `valid-*`
+must conform, `invalid-*` must not. Each folder has exactly two valid records:
 `valid-<name>.jsonld` with only the required properties, and
 `valid-<name>-full.jsonld` with every property the shape defines. Standards with
 several record types (safeguarding, assessments-and-plans) hold one node per
 type in a top-level `@graph`. `src/config.ts` lists the two valid ones per
-standard (the page fetches them from GitHub `main`), and the tests find each
-folder from those URLs and fail if list and folder disagree.
-`examples/<module>/expectations.json` also pins
-the issue code and JSON path each invalid example should produce, so a
-regression in wording fails the build.
+standard (the page fetches them from the ontology's `main`, whatever the ref
+box says), and the tests find each folder from those URLs and fail if list and
+folder disagree. `test/expectations/<module>.json` also pins the issue code and
+JSON path each invalid example should produce, so a regression in wording fails
+the build. They stay here because they pin this validator's wording.
+
+The ontology repo is otherwise generated: `SocialCareData/standard`'s sync
+`rsync --delete`s over it, excluding `/examples/`. Keep that exclusion.
 
 The 34 invalid verdicts match a baseline captured from the original
 `validate.js`, and the move to the generic library did not change any of them.

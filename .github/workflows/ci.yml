@@ -14,6 +14,9 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  ONTOLOGY_DIR: ${{ github.workspace }}/ontology
+
 jobs:
   # The Social Care layer and the conformance suite. The validation engine
   # itself is @theodi/data-standard-validator, tested in its own repo.
@@ -21,6 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      # The examples live in SocialCareData/ontology, at the ref whose shapes
+      # src/config.ts fetches.
+      - uses: actions/checkout@v7
+        with:
+          repository: SocialCareData/ontology
+          ref: main
+          path: ontology
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
@@ -32,12 +42,19 @@ jobs:
       - name: Pinned expectations still match
         run: |
           npm run expectations
-          git diff --exit-code examples/
+          git diff --exit-code test/expectations/
 
   web:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      # The examples live in SocialCareData/ontology, at the ref whose shapes
+      # src/config.ts fetches.
+      - uses: actions/checkout@v7
+        with:
+          repository: SocialCareData/ontology
+          ref: main
+          path: ontology
       - uses: actions/setup-node@v7
         with:
           node-version: '22'

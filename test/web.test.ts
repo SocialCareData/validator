@@ -18,6 +18,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ontologyDir } from './helpers.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -77,7 +78,7 @@ describe('the validator page', () => {
 
   test('reports a bad postcode with the field name and the line', async () => {
     const text = readFileSync(
-      join(root, 'examples/person/subject-of-care/invalid-bad-postcode.jsonld'), 'utf8')
+      join(ontologyDir, 'examples/person/subject-of-care/invalid-bad-postcode.jsonld'), 'utf8')
 
     await page.selectOption('[name="standard"]', { label: 'Person - subject of care' })
     await page.fill('[name="data"]', text)
@@ -99,7 +100,7 @@ describe('the validator page', () => {
 
   test('accepts a record that follows the standard', async () => {
     const text = readFileSync(
-      join(root, 'examples/person/subject-of-care/valid-subject-of-care.jsonld'), 'utf8')
+      join(ontologyDir, 'examples/person/subject-of-care/valid-subject-of-care.jsonld'), 'utf8')
     await page.fill('[name="data"]', text)
     await page.click('button.validate')
     await page.waitForSelector('.verdict.pass', { timeout: 120_000 })
@@ -108,7 +109,7 @@ describe('the validator page', () => {
 
   test('shows permitted values as pills for a controlled vocabulary', async () => {
     const text = readFileSync(
-      join(root, 'examples/person/subject-of-care/invalid-bad-gender.jsonld'), 'utf8')
+      join(ontologyDir, 'examples/person/subject-of-care/invalid-bad-gender.jsonld'), 'utf8')
     await page.fill('[name="data"]', text)
     await page.click('button.validate')
     await page.waitForSelector('.issue.violation .pill', { timeout: 120_000 })

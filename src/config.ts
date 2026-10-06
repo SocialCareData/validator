@@ -15,7 +15,12 @@
 import type { ValidatorConfig } from './component/config.js'
 
 const ONTOLOGY = 'https://github.com/SocialCareData/ontology/blob/main'
-const EXAMPLES = 'https://github.com/SocialCareData/validator/blob/main/examples'
+/*
+ * The examples sit beside the shapes but are not versioned with them: the ref
+ * box changes only shapes and contexts, and tags older than the examples'
+ * move to the ontology repository have none.
+ */
+const EXAMPLES = `${ONTOLOGY}/examples`
 
 /*
  * Every standard names its module context, although the examples declare the

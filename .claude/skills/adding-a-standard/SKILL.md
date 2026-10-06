@@ -24,7 +24,8 @@ that is not published yet.
 
 ## 2. Add examples
 
-`examples/<name>/`, named `valid-*.jsonld` and `invalid-*.jsonld`. `valid-*`
+`examples/<name>/` in SocialCareData/ontology (a checkout at `ONTOLOGY_DIR`,
+or `../ontology`), named `valid-*.jsonld` and `invalid-*.jsonld`. `valid-*`
 must conform and `invalid-*` must not.
 
 Write exactly two valid examples: `valid-<name>.jsonld` with only the required
@@ -65,7 +66,8 @@ comment in `src/config.ts`).
 
 The test suite finds the examples folder from the first example URL, and fails
 if the listed examples and the folder's `valid-*` files disagree. The page
-fetches the examples from `main` on GitHub, so they appear there once merged.
+fetches the examples from the ontology's `main` on GitHub, so they appear there
+once merged into that repository.
 
 If the new shapes use an `sh:pattern` that reads badly as its description,
 add a `PatternHint` to `patterns` in the same file.
@@ -74,7 +76,7 @@ add a `PatternHint` to `patterns` in the same file.
 
 ```bash
 npm run expectations
-git diff examples/
+git diff test/expectations/
 ```
 
 This records current behaviour, bugs included. **Read the diff.** Each invalid

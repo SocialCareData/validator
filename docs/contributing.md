@@ -7,6 +7,10 @@ npm test                    # conformance, integrity, config
 ```
 
 Tests fetch real shapes from the ontology repository, so they need a network.
+They read the example records from a local checkout of
+[SocialCareData/ontology](https://github.com/SocialCareData/ontology): clone it
+next to this repository (`../ontology`), or point `ONTOLOGY_DIR` at one.
+Keep it on `main`, the ref the shapes are fetched at.
 
 The validation engine is [@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator), in its own
 repository. Wording, skolemization, the report format and the formatters are
@@ -86,9 +90,9 @@ src/
     mount.ts        the toolbar, editor and results, wired together
     report.ts       a report, as DOM
     worker.ts       where validation runs
-examples/       the conformance suite
 scripts/        update-expectations.ts
 test/           conformance, integrity, config, context fallback, web
+  expectations/   the issues each invalid example must report
 ```
 
 `src/component/` imports nothing from outside itself except the engine, so
@@ -102,18 +106,20 @@ loads in the worker.
 
 ## Adding a standard
 
-1. Put examples under `examples/<name>/`: `valid-<name>.jsonld` with only the
-   required properties, `valid-<name>-full.jsonld` with all of them, and one
-   `invalid-*.jsonld` per defect. See [examples/README.md](../examples/README.md).
+1. Put examples under `examples/<name>/` in
+   [SocialCareData/ontology](https://github.com/SocialCareData/ontology):
+   `valid-<name>.jsonld` with only the required properties,
+   `valid-<name>-full.jsonld` with all of them, and one `invalid-*.jsonld` per
+   defect. See its [examples/README.md](https://github.com/SocialCareData/ontology/blob/main/examples/README.md).
 2. Add an entry to `src/config.ts`: a name, a one-line description, the shape
    and context URLs, and the two `valid-*` example URLs.
 3. Run `npm test`. The suite finds the folder from the example URLs, and fails
    if the listed examples and the folder's `valid-*` files disagree.
-4. Regenerate `examples/<name>/expectations.json` and **read it**. See below.
+4. Regenerate `test/expectations/<name>.json` and **read it**. See below.
 
 ## The expectations files
 
-`examples/<module>/expectations.json` pins, for every invalid example, the issue
+`test/expectations/<module>.json` pins, for every invalid example, the issue
 codes and JSON paths it should produce:
 
 ```json
@@ -143,14 +149,15 @@ The one thing that stays here is `patterns` in `src/config.ts`. It holds names f
 regexes the Social Care shapes use, such as "a UK postcode in upper case, with
 an optional space". Add an entry when a new `sh:pattern` reads badly.
 
-After any wording change, run `npm run expectations && git diff examples/`.
+After any wording change, run `npm run expectations && git diff test/expectations/`.
 The pinned codes and paths should not move.
 
 ## Deploying
 
 Nothing here is published to npm. `pages.yml` builds the app into `dist/` and deploys
 it to GitHub Pages on every push to `main` that touches the app (`src/`,
-`public/`, `index.html`) or the examples. It needs Settings → Pages → Source: **GitHub Actions**, once.
+`public/`, `index.html`). Examples are fetched from the ontology repository
+at run time, so a change there needs no redeploy. It needs Settings → Pages → Source: **GitHub Actions**, once.
 
 To pick up a new engine release, bump `@theodi/data-standard-validator` in
 `package.json`. Then run `npm test` and `npm run test:web`. A flipped verdict
