@@ -10,27 +10,23 @@
  */
 
 import { describe, expect, test, beforeAll } from 'vitest'
-import { readdirSync, readFileSync, existsSync } from 'node:fs'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { readFileSync, existsSync } from 'node:fs'
+import { join } from 'node:path'
 import type { Validator } from '@theodi/data-standard-validator'
-import { profiles } from '../src/catalogue.js'
-import { profileValidator } from '../src/profile.js'
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { exampleFiles, examplesDir, standards, validatorFor } from './helpers.js'
 
 interface Expectation { code: string, jsonPath: string }
 
-for (const entry of profiles) {
-  describe(entry.id, () => {
+for (const standard of standards) {
+  describe(standard.name, () => {
     let validator: Validator
 
     beforeAll(async () => {
-      validator = await profileValidator(entry.id)
+      validator = await validatorFor(standard)
     })
 
-    const dir = join(root, entry.examples)
-    const files = readdirSync(dir).filter((f) => f.endsWith('.jsonld')).sort()
+    const dir = examplesDir(standard)
+    const files = exampleFiles(standard)
 
     test('has examples', () => {
       expect(files.length).toBeGreaterThan(0)

@@ -1,0 +1,85 @@
+/* Social Care Data Validator - the page around the validator component.
+   Palette follows standard.socialcaredata.io: a deep blue frame around a white
+   working area. On wide screens the page is exactly one window tall, with the
+   component filling the space between header and footer; on phones it stacks
+   and scrolls as a normal page. The component brings its own colour tokens;
+   only the frame's are defined here. */
+
+:root {
+  color-scheme: light dark;
+
+  --frame: #0f4b69;
+  --frame-text: #ffffff;
+  --frame-muted: rgba(255, 255, 255, 0.72);
+  --frame-rule: rgba(255, 255, 255, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --frame: #0b384f; }
+}
+
+:root[data-theme="dark"] { --frame: #0b384f; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.55 var(--sans);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Header ------------------------------------------------------------ */
+
+.masthead { background: var(--frame); color: var(--frame-text); flex: none; }
+.masthead-inner {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 10px 24px;
+}
+.masthead-inner > * { white-space: nowrap; }
+.masthead a { color: var(--frame-text); text-decoration: none; }
+.masthead a:hover, .masthead a:focus { text-decoration: underline; }
+.home { font-size: 1.35rem; font-weight: 700; }
+.masthead h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--frame-muted);
+  padding-left: 14px;
+  border-left: 1px solid var(--frame-rule);
+}
+.masthead-nav { margin-left: auto; font-size: 1rem; }
+
+/* ---- Footer ------------------------------------------------------------ */
+
+.footer {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 16px;
+  padding: 6px 24px;
+  background: var(--frame);
+  color: var(--frame-muted);
+  font-size: 0.78rem;
+}
+.footer p { margin: 0; }
+.footer a { color: var(--frame-text); }
+
+.masthead a:focus-visible, .footer a:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  html, body { height: auto; }
+  .masthead-inner, .footer { padding-left: 16px; padding-right: 16px; }
+  .home { font-size: 1.15rem; }
+  .masthead h1 { font-size: 1rem; }
+  .masthead-nav { font-size: 0.9rem; }
+}

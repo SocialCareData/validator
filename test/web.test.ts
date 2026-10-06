@@ -29,8 +29,8 @@ let baseUrl: string
 const consoleErrors: string[] = []
 
 beforeAll(async () => {
-  const configFile = join(root, 'web', 'vite.config.ts')
-  // A scratch directory, so a test run never overwrites web/dist.
+  const configFile = join(root, 'vite.config.ts')
+  // A scratch directory, so a test run never overwrites dist/.
   outDir = mkdtempSync(join(tmpdir(), 'scd-validator-web-'))
   await build({ configFile, logLevel: 'warn', build: { outDir } })
   server = await preview({ configFile, build: { outDir }, preview: { port: 0 } })
@@ -59,21 +59,29 @@ afterAll(async () => {
 })
 
 describe('the validator page', () => {
-  test('lists every profile from the catalogue', async () => {
-    const options = await page.$$eval('#profile option', (nodes) =>
-      nodes.map((n) => (n as HTMLOptionElement).value))
-    expect(options).toContain('person:subject-of-care')
-    expect(options).toContain('placements')
+  test('lists every standard from the config', async () => {
+    const options = await page.$$eval('[name="standard"] option', (nodes) =>
+      nodes.map((n) => n.textContent))
+    expect(options).toContain('Person - subject of care')
+    expect(options).toContain("Children's Social Care Placements")
     expect(options).toHaveLength(5)
+  })
+
+  test('loads a configured example and validates it', async () => {
+    await page.selectOption('[name="standard"]', { label: 'Safeguarding' })
+    await page.selectOption('[name="example"]', { label: 'valid-safeguarding-full' })
+    await page.waitForSelector('.verdict', { timeout: 120_000 })
+    expect(await page.inputValue('[name="data"]')).toContain('@graph')
+    expect(await page.textContent('.verdict')).toContain('follows the standard')
   })
 
   test('reports a bad postcode with the field name and the line', async () => {
     const text = readFileSync(
       join(root, 'examples/person/subject-of-care/invalid-bad-postcode.jsonld'), 'utf8')
 
-    await page.selectOption('#profile', 'person:subject-of-care')
-    await page.fill('#input', text)
-    await page.click('#validate')
+    await page.selectOption('[name="standard"]', { label: 'Person - subject of care' })
+    await page.fill('[name="data"]', text)
+    await page.click('button.validate')
 
     await page.waitForSelector('.issue.violation', { timeout: 120_000 })
 
@@ -92,8 +100,8 @@ describe('the validator page', () => {
   test('accepts a record that follows the standard', async () => {
     const text = readFileSync(
       join(root, 'examples/person/subject-of-care/valid-subject-of-care.jsonld'), 'utf8')
-    await page.fill('#input', text)
-    await page.click('#validate')
+    await page.fill('[name="data"]', text)
+    await page.click('button.validate')
     await page.waitForSelector('.verdict.pass', { timeout: 120_000 })
     expect(await page.textContent('.verdict.pass')).toContain('follows the standard')
   })
@@ -101,8 +109,8 @@ describe('the validator page', () => {
   test('shows permitted values as pills for a controlled vocabulary', async () => {
     const text = readFileSync(
       join(root, 'examples/person/subject-of-care/invalid-bad-gender.jsonld'), 'utf8')
-    await page.fill('#input', text)
-    await page.click('#validate')
+    await page.fill('[name="data"]', text)
+    await page.click('button.validate')
     await page.waitForSelector('.issue.violation .pill', { timeout: 120_000 })
     const pills = await page.$$eval('.pill', (nodes) => nodes.map((n) => n.textContent))
     expect(pills.length).toBeGreaterThan(1)
@@ -110,10 +118,10 @@ describe('the validator page', () => {
   })
 
   test('explains malformed JSON instead of failing silently', async () => {
-    await page.fill('#input', '{ "name": ')
-    await page.click('#validate')
+    await page.fill('[name="data"]', '{ "name": ')
+    await page.click('button.validate')
     await page.waitForSelector('.issue, .banner.error', { timeout: 120_000 })
-    const body = await page.textContent('#results')
+    const body = await page.textContent('.results')
     expect(body?.toLowerCase()).toContain('json')
   })
 

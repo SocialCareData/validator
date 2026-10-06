@@ -8,20 +8,16 @@
  * committing it.
  */
 
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { profiles } from '../src/catalogue.js'
-import { profileValidator } from '../src/profile.js'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { exampleFiles, examplesDir, standards, validatorFor } from '../test/helpers.js'
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-
-for (const profile of profiles) {
-  const validator = await profileValidator(profile.id)
-  const dir = join(root, profile.examples)
+for (const standard of standards) {
+  const validator = await validatorFor(standard)
+  const dir = examplesDir(standard)
   const expectations: Record<string, { code: string, jsonPath: string }[]> = {}
 
-  for (const file of readdirSync(dir).filter((f) => f.endsWith('.jsonld')).sort()) {
+  for (const file of exampleFiles(standard)) {
     if (file.startsWith('valid-')) continue
     const report = await validator.validate({
       name: file,
@@ -34,5 +30,5 @@ for (const profile of profiles) {
   }
 
   writeFileSync(join(dir, 'expectations.json'), `${JSON.stringify(expectations, null, 2)}\n`)
-  console.log(`${profile.id}: ${Object.keys(expectations).length} invalid example(s)`)
+  console.log(`${standard.name}: ${Object.keys(expectations).length} invalid example(s)`)
 }

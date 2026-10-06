@@ -4,8 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'web/**'
       - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'vite.config.ts'
       - 'examples/**'
       - 'package.json'
       - 'package-lock.json'
@@ -32,11 +34,11 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npm run build:web
+      - run: npm run build
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: web/dist
+          path: dist
           # v4 onwards drops dotfiles by default, which would silently lose
           # .nojekyll from the published site.
           include-hidden-files: true

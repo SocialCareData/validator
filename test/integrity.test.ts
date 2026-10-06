@@ -7,35 +7,33 @@
  */
 
 import { describe, expect, test, beforeAll } from 'vitest'
-import { readdirSync, readFileSync } from 'node:fs'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { formatReport, SKOLEM_PREFIX, type Validator } from '@theodi/data-standard-validator'
-import { profiles } from '../src/catalogue.js'
-import { profileValidator } from '../src/profile.js'
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+import { exampleFiles, examplesDir, standards, validatorFor } from './helpers.js'
 
 const loaded: Record<string, Validator> = {}
 const unskolemized: Record<string, Validator> = {}
 
 beforeAll(async () => {
-  for (const entry of profiles) {
-    loaded[entry.id] = await profileValidator(entry.id)
-    unskolemized[entry.id] = await profileValidator(entry.id, { skolemize: false })
+  for (const standard of standards) {
+    loaded[standard.name] = await validatorFor(standard)
+    unskolemized[standard.name] = await validatorFor(standard, { skolemize: false })
   }
 })
 
-describe('skolemization is verdict-neutral', () => {
-  for (const entry of profiles) {
-    const dir = join(root, entry.examples)
-    const files = readdirSync(dir).filter((f) => f.endsWith('.jsonld')).sort()
+const names = standards.map((s) => s.name)
+const byName = (name: string): (typeof standards)[number] => standards.find((s) => s.name === name)!
 
-    test.each(files)(`${entry.id} / %s`, async (file) => {
+describe('skolemization is verdict-neutral', () => {
+  for (const standard of standards) {
+    const dir = examplesDir(standard)
+
+    test.each(exampleFiles(standard))(`${standard.name} / %s`, async (file) => {
       const text = readFileSync(join(dir, file), 'utf8')
 
-      const withSkolem = await loaded[entry.id]!.validate({ name: file, text })
-      const without = await unskolemized[entry.id]!.validate({ name: file, text })
+      const withSkolem = await loaded[standard.name]!.validate({ name: file, text })
+      const without = await unskolemized[standard.name]!.validate({ name: file, text })
 
       expect(without.conforms).toBe(withSkolem.conforms)
     })
@@ -43,11 +41,9 @@ describe('skolemization is verdict-neutral', () => {
 })
 
 describe('synthetic identifiers stay internal', () => {
-  test.each(profiles.map((e) => e.id))('%s', async (id) => {
-    const entry = profiles.find((e) => e.id === id)!
-    const dir = join(root, entry.examples)
-    const files = readdirSync(dir).filter((f) => f.endsWith('.jsonld')).sort()
-    const report = await loaded[id]!.validateAll(files.map((f) => ({
+  test.each(names)('%s', async (name) => {
+    const dir = examplesDir(byName(name))
+    const report = await loaded[name]!.validateAll(exampleFiles(byName(name)).map((f) => ({
       name: f, text: readFileSync(join(dir, f), 'utf8'),
     })))
 
@@ -58,18 +54,16 @@ describe('synthetic identifiers stay internal', () => {
 })
 
 describe('the published shapes permit skolemization', () => {
-  test.each(profiles.map((e) => e.id))('%s has no sh:nodeKind sh:BlankNode', (id) => {
-    expect(loaded[id]!.skolemSafe).toBe(true)
+  test.each(names)('%s has no sh:nodeKind sh:BlankNode', (name) => {
+    expect(loaded[name]!.skolemSafe).toBe(true)
   })
 })
 
 describe('reports never leak raw IRIs into the human layer', () => {
-  test.each(profiles.map((e) => e.id))('%s', async (id) => {
-    const entry = profiles.find((e) => e.id === id)!
-    const dir = join(root, entry.examples)
-    const files = readdirSync(dir).filter((f) => f.startsWith('invalid-')).sort()
-    for (const file of files) {
-      const report = await loaded[id]!.validate({
+  test.each(names)('%s', async (name) => {
+    const dir = examplesDir(byName(name))
+    for (const file of exampleFiles(byName(name)).filter((f) => f.startsWith('invalid-'))) {
+      const report = await loaded[name]!.validate({
         name: file, text: readFileSync(join(dir, file), 'utf8'),
       })
       for (const issue of report.issues) {

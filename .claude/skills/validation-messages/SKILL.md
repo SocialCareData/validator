@@ -13,8 +13,8 @@ against the real standards.
 
 ## What stays in this repo
 
-`src/patterns.ts` holds `PatternHint`s, plain-English names for the regexes the
-Social Care shapes use:
+`patterns` in `src/config.ts` holds `PatternHint`s, plain-English names for the
+regexes the Social Care shapes use:
 
 ```ts
 { pattern: '^[AEU]{3}$', description: 'three letters, each one A, E or U', example: 'AEU' }
@@ -30,7 +30,7 @@ shape's `sh:description` and lifts the example out of any `(e.g. ...)`.
 (cd ../data-standard-validator && npm run build)   # only for an engine change
 npm run expectations && git diff examples/          # codes and paths must not move
 npm test
-npm run dev:web                                     # read it as a user would
+npm run dev                                         # read it as a user would
 ```
 
 An issue with code `other` means the engine has no case for that constraint.

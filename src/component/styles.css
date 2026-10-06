@@ -1,18 +1,13 @@
-/* Social Care Data Validator - page styles.
-   Palette follows standard.socialcaredata.io: a deep blue frame around a white
-   working area. On wide screens the page is exactly one window tall, with the
-   editor and the results each scrolling on their own; on phones it stacks and
-   scrolls as a normal page. Colours are tokens so the dark scheme is a
-   redefinition rather than a second stylesheet. */
+/* The validator component's styles.
 
-:root {
-  color-scheme: light dark;
+   Every rule is scoped under .dsv, the class on the element the component is
+   mounted into, so nothing leaks into the host page. Colours are tokens with
+   zero-specificity defaults: a host restyles the component by setting the same
+   custom properties on its own :root, in any order. On wide screens the
+   component fills the space it is given, with the editor and the results each
+   scrolling on their own; on phones it stacks. */
 
-  --frame: #0f4b69;
-  --frame-deep: #0b384f;
-  --frame-text: #ffffff;
-  --frame-muted: rgba(255, 255, 255, 0.72);
-  --frame-rule: rgba(255, 255, 255, 0.28);
+:where(:root) {
   --bg: #ffffff;
   --surface: #ffffff;
   --surface-2: #f4f6f9;
@@ -49,9 +44,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --frame: #0b384f;
-    --frame-deep: #082a3b;
+  :where(:root:not([data-theme="light"])) {
     --bg: #0e1a24;
     --surface: #132330;
     --surface-2: #182b3a;
@@ -84,9 +77,7 @@
   }
 }
 
-:root[data-theme="dark"] {
-  --frame: #0b384f;
-  --frame-deep: #082a3b;
+:where(:root[data-theme="dark"]) {
   --bg: #0e1a24;
   --surface: #132330;
   --surface-2: #182b3a;
@@ -118,49 +109,22 @@
   --selection: rgba(143, 180, 240, 0.3);
 }
 
-* { box-sizing: border-box; }
-
-html, body { height: 100%; }
-
-body {
-  margin: 0;
+.dsv {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--bg);
   color: var(--text);
   font: 16px/1.55 var(--sans);
-  display: flex;
-  flex-direction: column;
 }
-
-a { color: var(--link); }
-a:hover, a:focus { color: var(--link-hover); }
-
-/* ---- Header ------------------------------------------------------------ */
-
-.masthead { background: var(--frame); color: var(--frame-text); flex: none; }
-.masthead-inner {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  padding: 10px 24px;
-}
-.masthead-inner > * { white-space: nowrap; }
-.masthead a { color: var(--frame-text); text-decoration: none; }
-.masthead a:hover, .masthead a:focus { text-decoration: underline; }
-.home { font-size: 1.35rem; font-weight: 700; }
-.masthead h1 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 400;
-  color: var(--frame-muted);
-  padding-left: 14px;
-  border-left: 1px solid var(--frame-rule);
-}
-.masthead-nav { margin-left: auto; font-size: 1rem; }
+.dsv * { box-sizing: border-box; }
+.dsv a { color: var(--link); }
+.dsv a:hover, .dsv a:focus { color: var(--link-hover); }
 
 /* ---- Toolbar ----------------------------------------------------------- */
 
-.toolbar {
+.dsv .toolbar {
   flex: none;
   display: flex;
   flex-wrap: wrap;
@@ -171,14 +135,14 @@ a:hover, a:focus { color: var(--link-hover); }
   background: var(--surface-2);
   position: relative;
 }
-.field { flex: 0 1 18rem; min-width: 12rem; }
-.field label, .advanced-body label {
+.dsv .field { flex: 0 1 18rem; min-width: 12rem; }
+.dsv .field label, .dsv .advanced-body label {
   display: block;
   font-weight: 700;
   font-size: 0.8rem;
   margin-bottom: 4px;
 }
-select, input#ref {
+.dsv select, .dsv .ref-input {
   width: 100%;
   padding: 7px 10px;
   border: 1px solid var(--border);
@@ -188,12 +152,12 @@ select, input#ref {
   font: inherit;
   font-size: 0.95rem;
 }
-.help { margin: 6px 0 0; font-size: 0.82rem; color: var(--text-dim); }
-.toolbar-help { flex: 1 0 100%; margin: 0; }
-.toolbar-help:empty { display: none; }
+.dsv .help { margin: 6px 0 0; font-size: 0.82rem; color: var(--text-dim); }
+.dsv .toolbar-help { flex: 1 0 100%; margin: 0; }
+.dsv .toolbar-help:empty { display: none; }
 
-.actions { display: flex; gap: 8px; }
-button {
+.dsv .actions { display: flex; gap: 8px; }
+.dsv button {
   font: inherit;
   font-size: 0.95rem;
   padding: 7px 18px;
@@ -201,21 +165,21 @@ button {
   border: 1px solid transparent;
   cursor: pointer;
 }
-button.primary { background: var(--accent); color: var(--accent-text); font-weight: 700; }
-button.primary:hover { filter: brightness(1.12); }
-button.primary:disabled { opacity: 0.6; cursor: progress; }
-button.ghost { background: var(--surface); border-color: var(--border); color: var(--text); }
-button.ghost:hover { border-color: var(--accent); }
-button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible,
-summary:focus-visible, a:focus-visible, .issue:focus-visible {
+.dsv button.primary { background: var(--accent); color: var(--accent-text); font-weight: 700; }
+.dsv button.primary:hover { filter: brightness(1.12); }
+.dsv button.primary:disabled { opacity: 0.6; cursor: progress; }
+.dsv button.ghost { background: var(--surface); border-color: var(--border); color: var(--text); }
+.dsv button.ghost:hover { border-color: var(--accent); }
+.dsv button:focus-visible, .dsv select:focus-visible, .dsv textarea:focus-visible, .dsv input:focus-visible,
+.dsv summary:focus-visible, .dsv a:focus-visible, .dsv .issue:focus-visible {
   outline: 2px solid var(--link);
   outline-offset: 2px;
 }
 
-.advanced { align-self: center; margin-left: auto; }
-.advanced summary { cursor: pointer; font-size: 0.85rem; color: var(--text-dim); }
+.dsv .advanced { align-self: center; margin-left: auto; }
+.dsv .advanced summary { cursor: pointer; font-size: 0.85rem; color: var(--text-dim); }
 /* Floats over the workspace, so opening it never pushes the panes around. */
-.advanced-body {
+.dsv .advanced-body {
   position: absolute;
   right: 24px;
   top: calc(100% - 4px);
@@ -230,21 +194,21 @@ summary:focus-visible, a:focus-visible, .issue:focus-visible {
 
 /* ---- Workspace: editor | results --------------------------------------- */
 
-.workspace {
+.dsv .workspace {
   flex: 1;
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
-.pane {
+.dsv .pane {
   display: flex;
   flex-direction: column;
   min-height: 0;
   min-width: 0;
   padding: 12px 24px 12px;
 }
-.editor-pane { border-right: 1px solid var(--border); }
-.pane-head {
+.dsv .editor-pane { border-right: 1px solid var(--border); }
+.dsv .pane-head {
   flex: none;
   font-size: 0.8rem;
   font-weight: 700;
@@ -254,7 +218,7 @@ summary:focus-visible, a:focus-visible, .issue:focus-visible {
   margin: 0 0 8px;
 }
 
-.editor {
+.dsv .editor {
   flex: 1;
   min-height: 0;
   display: flex;
@@ -263,7 +227,7 @@ summary:focus-visible, a:focus-visible, .issue:focus-visible {
   overflow: hidden;
   background: var(--surface);
 }
-.gutter {
+.dsv .gutter {
   margin: 0;
   /* Extra bottom room so the gutter can always scroll as far as the textarea,
      whose horizontal scrollbar eats into its own height. */
@@ -278,13 +242,13 @@ summary:focus-visible, a:focus-visible, .issue:focus-visible {
   min-width: 3.2rem;
   white-space: pre;
 }
-.gutter .flagged { color: var(--violation); font-weight: 700; }
-.gutter .current { background: var(--violation-bg); border-radius: 3px; }
+.dsv .gutter .flagged { color: var(--violation); font-weight: 700; }
+.dsv .gutter .current { background: var(--violation-bg); border-radius: 3px; }
 /* Colouring is a <pre> painted behind a transparent textarea. The two must
    share every metric that affects where a character lands - font, padding,
    tab size, wrapping - or the colours drift away from the text. */
-.code { position: relative; flex: 1; min-width: 0; }
-.highlight, textarea#input {
+.dsv .code { position: relative; flex: 1; min-width: 0; }
+.dsv .highlight, .dsv .input {
   margin: 0;
   border: 0;
   padding: 12px;
@@ -297,7 +261,7 @@ summary:focus-visible, a:focus-visible, .issue:focus-visible {
   white-space: pre;
   overflow-wrap: normal;
 }
-.highlight {
+.dsv .highlight {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -307,7 +271,7 @@ summary:focus-visible, a:focus-visible, .issue:focus-visible {
   padding-right: 32px;
   padding-bottom: 32px;
 }
-textarea#input {
+.dsv .input {
   position: relative;
   display: block;
   width: 100%;
@@ -318,24 +282,24 @@ textarea#input {
   color: transparent;
   caret-color: var(--text);
 }
-textarea#input::placeholder { color: var(--text-dim); }
-textarea#input::selection { color: transparent; background: var(--selection); }
+.dsv .input::placeholder { color: var(--text-dim); }
+.dsv .input::selection { color: transparent; background: var(--selection); }
 
-.tok-key { color: var(--syn-key); }
-.tok-keyword { color: var(--syn-keyword); }
-.tok-string { color: var(--syn-string); }
-.tok-number { color: var(--syn-number); }
-.tok-literal { color: var(--syn-literal); }
-.tok-punct { color: var(--syn-punct); }
-.privacy { flex: none; font-size: 0.78rem; color: var(--text-dim); margin: 6px 2px 0; }
+.dsv .tok-key { color: var(--syn-key); }
+.dsv .tok-keyword { color: var(--syn-keyword); }
+.dsv .tok-string { color: var(--syn-string); }
+.dsv .tok-number { color: var(--syn-number); }
+.dsv .tok-literal { color: var(--syn-literal); }
+.dsv .tok-punct { color: var(--syn-punct); }
+.dsv .privacy { flex: none; font-size: 0.78rem; color: var(--text-dim); margin: 6px 2px 0; }
 
-.results-scroll {
+.dsv .results-scroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   padding-right: 4px;
 }
-.results:empty::before {
+.dsv .results:empty::before {
   content: "Validate a record to see what needs fixing. Choose an example above to try it out.";
   display: block;
   padding: 18px 16px;
@@ -347,7 +311,7 @@ textarea#input::selection { color: transparent; background: var(--selection); }
 
 /* ---- Result cards ------------------------------------------------------ */
 
-.verdict {
+.dsv .verdict {
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -358,15 +322,15 @@ textarea#input::selection { color: transparent; background: var(--selection); }
   border-left-width: 5px;
   margin-bottom: 14px;
 }
-.verdict.pass { background: var(--ok-bg); border-color: var(--ok-edge); }
-.verdict.pass strong { color: var(--ok); }
-.verdict.fail { background: var(--violation-bg); border-color: var(--violation-edge); }
-.verdict.fail strong { color: var(--violation); }
-.verdict strong { font-size: 1.05rem; }
-.verdict .muted { color: var(--text-dim); font-size: 0.85rem; }
+.dsv .verdict.pass { background: var(--ok-bg); border-color: var(--ok-edge); }
+.dsv .verdict.pass strong { color: var(--ok); }
+.dsv .verdict.fail { background: var(--violation-bg); border-color: var(--violation-edge); }
+.dsv .verdict.fail strong { color: var(--violation); }
+.dsv .verdict strong { font-size: 1.05rem; }
+.dsv .verdict .muted { color: var(--text-dim); font-size: 0.85rem; }
 
-.group { margin-bottom: 16px; }
-.group > h3 {
+.dsv .group { margin-bottom: 16px; }
+.dsv .group > h3 {
   font-size: 0.8rem;
   letter-spacing: 0.02em;
   font-family: var(--mono);
@@ -374,7 +338,7 @@ textarea#input::selection { color: transparent; background: var(--selection); }
   margin: 0 0 6px;
 }
 
-.issue {
+.dsv .issue {
   border: 1px solid var(--border);
   border-left-width: 4px;
   border-radius: var(--radius);
@@ -383,20 +347,20 @@ textarea#input::selection { color: transparent; background: var(--selection); }
   margin-bottom: 8px;
   cursor: pointer;
 }
-.issue.violation { border-left-color: var(--violation-edge); }
-.issue.warning { border-left-color: var(--warning-edge); }
-.issue.info { border-left-color: var(--info-edge); }
-.issue:hover { border-color: var(--accent); }
-.issue.violation:hover { border-left-color: var(--violation-edge); }
-.issue.warning:hover { border-left-color: var(--warning-edge); }
+.dsv .issue.violation { border-left-color: var(--violation-edge); }
+.dsv .issue.warning { border-left-color: var(--warning-edge); }
+.dsv .issue.info { border-left-color: var(--info-edge); }
+.dsv .issue:hover { border-color: var(--accent); }
+.dsv .issue.violation:hover { border-left-color: var(--violation-edge); }
+.dsv .issue.warning:hover { border-left-color: var(--warning-edge); }
 
-.issue-title { font-weight: 700; margin: 0 0 4px; }
-.issue-title code { font-family: var(--mono); font-size: 0.92em; }
-.issue-meta { font-size: 0.8rem; color: var(--text-dim); font-family: var(--mono); margin: 0; }
-.issue-hint { margin: 6px 0 0; font-size: 0.9rem; color: var(--text-dim); }
+.dsv .issue-title { font-weight: 700; margin: 0 0 4px; }
+.dsv .issue-title code { font-family: var(--mono); font-size: 0.92em; }
+.dsv .issue-meta { font-size: 0.8rem; color: var(--text-dim); font-family: var(--mono); margin: 0; }
+.dsv .issue-hint { margin: 6px 0 0; font-size: 0.9rem; color: var(--text-dim); }
 
-.pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-.pill {
+.dsv .pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.dsv .pill {
   font: 0.78rem/1 var(--mono);
   padding: 5px 8px;
   border-radius: 999px;
@@ -405,9 +369,9 @@ textarea#input::selection { color: transparent; background: var(--selection); }
   color: var(--text-dim);
 }
 
-.issue details { margin-top: 8px; }
-.issue details summary { font-size: 0.8rem; color: var(--text-dim); cursor: pointer; }
-.issue details dl {
+.dsv .issue details { margin-top: 8px; }
+.dsv .issue details summary { font-size: 0.8rem; color: var(--text-dim); cursor: pointer; }
+.dsv .issue details dl {
   margin: 8px 0 0;
   font: 0.78rem/1.5 var(--mono);
   color: var(--text-dim);
@@ -415,10 +379,10 @@ textarea#input::selection { color: transparent; background: var(--selection); }
   grid-template-columns: max-content 1fr;
   gap: 2px 10px;
 }
-.issue details dt { font-weight: 700; }
-.issue details dd { margin: 0; overflow-wrap: anywhere; }
+.dsv .issue details dt { font-weight: 700; }
+.dsv .issue details dd { margin: 0; overflow-wrap: anywhere; }
 
-.banner {
+.dsv .banner {
   padding: 10px 14px;
   border-radius: var(--radius);
   margin-bottom: 12px;
@@ -427,46 +391,20 @@ textarea#input::selection { color: transparent; background: var(--selection); }
   border-left-width: 4px;
   color: var(--text);
 }
-.banner.warning { background: var(--warning-bg); border-color: var(--warning-edge); }
-.banner.info { background: var(--info-bg); border-color: var(--info-edge); }
-.banner.error { background: var(--violation-bg); border-color: var(--violation-edge); }
+.dsv .banner.warning { background: var(--warning-bg); border-color: var(--warning-edge); }
+.dsv .banner.info { background: var(--info-bg); border-color: var(--info-edge); }
+.dsv .banner.error { background: var(--violation-bg); border-color: var(--violation-edge); }
 
-/* ---- Footer ------------------------------------------------------------ */
-
-.footer {
-  flex: none;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 2px 16px;
-  padding: 6px 24px;
-  background: var(--frame);
-  color: var(--frame-muted);
-  font-size: 0.78rem;
-}
-.footer p { margin: 0; }
-.footer a { color: var(--frame-text); }
-
-.visually-hidden {
-  position: absolute; width: 1px; height: 1px;
-  padding: 0; margin: -1px; overflow: hidden;
-  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-}
-
-/* On narrow screens two half-width panes are unusable, and a fixed window
-   height would leave the editor a sliver. Stack and let the page scroll. */
+/* On narrow screens two half-width panes are unusable, and a fixed height
+   would leave the editor a sliver. Stack, and let the page scroll. */
 @media (max-width: 860px) {
-  html, body { height: auto; }
-  .masthead-inner, .toolbar, .pane, .footer { padding-left: 16px; padding-right: 16px; }
-  .home { font-size: 1.15rem; }
-  .masthead h1 { font-size: 1rem; }
-  .masthead-nav { font-size: 0.9rem; }
-  .workspace { grid-template-columns: minmax(0, 1fr); }
-  .editor-pane { border-right: 0; border-bottom: 1px solid var(--border); }
-  .editor { height: 24rem; flex: none; }
-  .results-scroll { overflow: visible; }
-  .field { flex: 1 1 100%; }
-  .actions { flex: 1; }
-  .actions button { flex: 1; }
-  .advanced-body { right: 16px; }
+  .dsv .toolbar, .dsv .pane { padding-left: 16px; padding-right: 16px; }
+  .dsv .workspace { grid-template-columns: minmax(0, 1fr); }
+  .dsv .editor-pane { border-right: 0; border-bottom: 1px solid var(--border); }
+  .dsv .editor { height: 24rem; flex: none; }
+  .dsv .results-scroll { overflow: visible; }
+  .dsv .field { flex: 1 1 100%; }
+  .dsv .actions { flex: 1; }
+  .dsv .actions button { flex: 1; }
+  .dsv .advanced-body { right: 16px; }
 }

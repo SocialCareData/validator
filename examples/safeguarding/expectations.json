@@ -2,7 +2,7 @@
   "invalid-episode-bad-outcome.jsonld": [
     {
       "code": "value-not-allowed",
-      "jsonPath": "outcome"
+      "jsonPath": "episodeOutcome"
     }
   ],
   "invalid-episode-missing-subjectPerson.jsonld": [

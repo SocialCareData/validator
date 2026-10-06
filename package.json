@@ -17,14 +17,13 @@
     "url": "https://github.com/SocialCareData/validator/issues"
   },
   "sideEffects": [
-    "./web/src/worker-globals.ts"
+    "./src/component/worker-globals.ts"
   ],
   "scripts": {
-    "build:web": "vite build --config web/vite.config.ts",
-    "dev:web": "vite --config web/vite.config.ts",
-    "preview": "vite preview --config web/vite.config.ts",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "typecheck:web": "tsc --noEmit -p web/tsconfig.json",
     "test": "vitest run --exclude '**/web.test.ts' --exclude '**/node_modules/**'",
     "test:web": "vitest run test/web.test.ts",
     "test:conformance": "vitest run test/conformance.test.ts",

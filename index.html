@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f4b69" />
+    <title>Social Care Data Validator</title>
+    <meta name="description" content="Check social care records against the published Social Care MAIS SHACL shapes, in your browser." />
+    <link rel="icon" type="image/png" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="masthead-inner">
+        <a class="home" href="https://standard.socialcaredata.io" rel="noreferrer">Social Care Data</a>
+        <h1>Validator</h1>
+        <nav class="masthead-nav" aria-label="Site">
+          <a href="https://standard.socialcaredata.io" rel="noreferrer">The standards</a>
+        </nav>
+      </div>
+    </header>
+
+    <div id="validator"></div>
+
+    <footer class="footer">
+      <p>
+        Stewarded by the <a href="http://theodi.org/" rel="noreferrer">Open Data Institute</a>
+      </p>
+      <p class="footer-links">
+        <a href="https://github.com/SocialCareData/validator" rel="noreferrer">Source</a>
+        · <a href="https://theodi.github.io/data-standard-validator/" rel="noreferrer">Command-line tool</a>
+        · <a href="https://github.com/theodi/data-standard-validator/blob/main/docs/error-reference.md" rel="noreferrer">What the messages mean</a>
+        · <a href="https://github.com/SocialCareData/validator/issues/new" rel="noreferrer">Give feedback</a>
+      </p>
+    </footer>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

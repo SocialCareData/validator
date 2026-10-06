@@ -3,20 +3,21 @@
 ```bash
 npm install
 npm run typecheck           # src/, test/ and scripts/
-npm test                    # conformance, integrity, cross-record
+npm test                    # conformance, integrity, config
 ```
 
 Tests fetch real shapes from the ontology repository, so they need a network.
 
 The validation engine is [@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator), in its own
 repository. Wording, skolemization, the report format and the formatters are
-changed there. This repo holds what is specific to Social Care, plus the
-conformance suite that keeps the engine honest against real standards.
+changed there. This repo holds the validator UI as a generic component, the
+Social Care configuration and page around it, and the conformance suite that
+keeps the engine honest against real standards.
 
 ## Running the web app locally
 
 ```bash
-npm run dev:web
+npm run dev
 ```
 
 Then open **<http://localhost:5173/validator/>**. Mind the `/validator/` — the
@@ -31,7 +32,7 @@ the page before it is released, link a local checkout of the library:
 To check the real production bundle - the thing GitHub Pages actually serves:
 
 ```bash
-npm run build:web
+npm run build
 npm run preview             # http://localhost:4173/validator/
 ```
 
@@ -50,8 +51,8 @@ npx playwright install chromium    # once
 npm run test:web
 ```
 
-Six tests drive a real Chromium against a real dev server: every profile is
-listed, a bad postcode reports the field name and line number, a valid record
+Seven tests drive a real Chromium against the production build: every standard is
+listed, a configured example loads and passes, a bad postcode reports the field name and line number, a valid record
 passes, a controlled vocabulary renders its permitted values, malformed JSON is
 explained rather than swallowed, and the browser console stays clean throughout.
 
@@ -67,39 +68,47 @@ HEADED=1 SLOWMO=250 npm run test:web   # slowly enough to follow
 npx vitest run test/web.test.ts --reporter verbose
 ```
 
-`npm run typecheck:web` typechecks the app, and `npm run typecheck` checks
-everything else.
+`npm run typecheck` checks the app, the tests and the scripts together.
 
 ## Layout
 
 ```
-src/            the Social Care layer, shared by the page and the tests
-  catalogue.ts    which profiles exist, and which files each one loads
-  cross-checks.ts constraints that span a whole set of records
-  patterns.ts     plain-English names for the regexes the shapes use
-  profile.ts      a profile, loaded into a ready validator (memoised)
-web/            the GitHub Pages app
+index.html      the Social Care header and footer, around a mount point
+public/         static files copied as-is into the build
+src/
+  config.ts       the Social Care standards: shape, context and example URLs,
+                  descriptions, and plain-English names for the regexes
+  main.ts         mounts the component with src/config.ts
+  site.css        the header and footer
+  component/      the validator UI, with nothing specific to Social Care
+    config.ts       the config's types, and how its URLs become fetchable
+    engine.ts       a configured standard, loaded into a ready validator (memoised)
+    mount.ts        the toolbar, editor and results, wired together
+    report.ts       a report, as DOM
+    worker.ts       where validation runs
 examples/       the conformance suite
 scripts/        update-expectations.ts
-test/           conformance, integrity, cross-checks, web
+test/           conformance, integrity, config, context fallback, web
 ```
 
-`src/catalogue.ts` deliberately imports nothing from the engine. The page's
-main thread imports it to fill the profile picker, and keeping the RDF stack
-out of it keeps that bundle small. The validator itself only ever loads in the
-worker. Profile descriptions for the `<select>` live in
-`web/src/descriptions.ts`.
+`src/component/` imports nothing from outside itself except the engine, so
+it can move into its own package unchanged. Keep it that way: anything
+specific to a standard belongs in the config.
 
-## Adding a profile
+`src/config.ts` and `component/config.ts` import nothing from the engine but
+types. The page's main thread imports them to fill the pickers, and keeping the
+RDF stack out of them keeps that bundle small. The validator itself only ever
+loads in the worker.
 
-1. Add an entry to `src/catalogue.ts`: shape files, context, and any
-   cross-record checks (by name, from `src/cross-checks.ts`). If it should appear in the web picker, add a line to
-   `web/src/descriptions.ts` too.
-2. Put examples under `examples/<name>/`: `valid-<name>.jsonld` with only the
+## Adding a standard
+
+1. Put examples under `examples/<name>/`: `valid-<name>.jsonld` with only the
    required properties, `valid-<name>-full.jsonld` with all of them, and one
    `invalid-*.jsonld` per defect. See [examples/README.md](../examples/README.md).
-3. Run `npm run test:conformance`. The suite discovers the new folder
-   automatically.
+2. Add an entry to `src/config.ts`: a name, a one-line description, the shape
+   and context URLs, and the two `valid-*` example URLs.
+3. Run `npm test`. The suite finds the folder from the example URLs, and fails
+   if the listed examples and the folder's `valid-*` files disagree.
 4. Regenerate `examples/<name>/expectations.json` and **read it**. See below.
 
 ## The expectations files
@@ -130,7 +139,7 @@ Messages are built by the engine, in
 repository. Change them there, with a test and an entry in its
 `docs/error-reference.md`.
 
-The one thing that stays here is `src/patterns.ts`. It holds names for the
+The one thing that stays here is `patterns` in `src/config.ts`. It holds names for the
 regexes the Social Care shapes use, such as "a UK postcode in upper case, with
 an optional space". Add an entry when a new `sh:pattern` reads badly.
 
@@ -139,13 +148,13 @@ The pinned codes and paths should not move.
 
 ## Deploying
 
-Nothing here is published to npm. `pages.yml` builds `web/` and deploys it to
-GitHub Pages on every push to `main` that touches the app, `src/` or the
-examples. It needs Settings → Pages → Source: **GitHub Actions**, once.
+Nothing here is published to npm. `pages.yml` builds the app into `dist/` and deploys
+it to GitHub Pages on every push to `main` that touches the app (`src/`,
+`public/`, `index.html`) or the examples. It needs Settings → Pages → Source: **GitHub Actions**, once.
 
 To pick up a new engine release, bump `@theodi/data-standard-validator` in
 `package.json`. Then run `npm test` and `npm run test:web`. A flipped verdict
 in the conformance suite is a regression in the engine, not an improvement.
 
-When the ontology repo cuts its first tag, change `DEFAULT_REF` in
-`src/catalogue.ts` from `main` to that tag, and run `npm run test:conformance`.
+To pin the page to an ontology tag, set `ref` in `src/config.ts` (or change
+`main` in its URLs), and run `npm test`.

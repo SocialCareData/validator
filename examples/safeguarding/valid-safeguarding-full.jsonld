@@ -63,7 +63,7 @@
         "use": "official"
       },
       "role": ["Social Worker", "Team Lead - Referral & Assessment"],
-      "status": true,
+      "workingStatus": true,
       "contact": {
         "@type": "Contact",
         "name": "Work",
@@ -144,7 +144,7 @@
           "text": ["Home environment observed to be stable and supportive."]
         }
       ],
-      "outcome": "continuation"
+      "episodeOutcome": "continuation"
     },
     {
       "@id": "ex:le-2026-0007",

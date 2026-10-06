@@ -1,16 +1,18 @@
 # Social Care Data Validator
 
 Validates social care records against the published Social Care MAIS SHACL
-shapes. This repo is the GitHub Pages app plus the Social Care layer over
-**[@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator)**, the generic engine, which lives in
+shapes. This repo is the GitHub Pages app: a generic validator UI component
+(`src/component/`), the Social Care config it is mounted with
+(`src/config.ts`), and the page around it. The engine is
+**[@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator)**, which lives in
 its own repository (locally `../data-standard-validator`). Nothing here is
 published to npm.
 
 ```bash
-npm test                # conformance, integrity, cross-checks - needs a network
-npm run typecheck       # src/, test/, scripts/
+npm test                # conformance, integrity, config - needs a network
+npm run typecheck       # src/, test/, scripts/ - the app included
 npm run expectations    # regenerate examples/*/expectations.json - read the diff
-npm run dev:web         # http://localhost:5173/validator/  (mind the base path)
+npm run dev             # http://localhost:5173/validator/  (mind the base path)
 npm run test:web        # real Chromium; `npx playwright install chromium` once
 ```
 
@@ -18,34 +20,42 @@ npm run test:web        # real Chromium; `npx playwright install chromium` once
 
 **Engine changes belong in the library.** Wording, skolemization, context
 handling, the report contract and the formatters are all in
-`@theodi/data-standard-validator`. Here there are only four files in `src/`:
-the catalogue, the cross-checks, the pattern names and `profile.ts`. If a
+`@theodi/data-standard-validator`. Here the only Social Care code is
+`src/config.ts`; the rest of `src/` is the UI component and the page. If a
 change to how issues read seems to need code here, it probably belongs
 upstream as an option.
+
+**`src/component/` is domain-free.** It is being prepared to move into its
+own package, so it imports nothing outside itself except the engine, and holds
+nothing specific to Social Care: no names, URLs, copy or storage keys.
+Anything about a particular standard goes in the config.
 
 **Until the library is on npm, the dependency is `file:../data-standard-validator`.**
 Rebuild the library (`npm run build` there) for changes to show up here. Once
 0.1.0 is published, switch to `"^0.1.0"`, because CI cannot resolve a `file:`
 link.
 
-**Shapes are never vendored.** `src/catalogue.ts` holds URLs into
-SocialCareData/ontology, which are fetched at run time. Never add a local copy
-of a `.ttl` or a `context.jsonld`. The page must not be able to disagree with
-the published standard. `DEFAULT_REF` is `main` until that repo cuts its first
-tag.
+**Shapes are never vendored.** `src/config.ts` holds GitHub URLs into
+SocialCareData/ontology, which are fetched at run time from
+`raw.githubusercontent.com` (the only GitHub host that sends CORS headers).
+Never add a local copy of a `.ttl` or a `context.jsonld`. The page must not be
+able to disagree with the published standard. The URLs say `blob/main`; the
+page's ref box replaces that ref in every shape and context URL.
 
-**`src/catalogue.ts` must not import the engine.** The page's main thread
-imports it for the profile picker, and pulling in the RDF stack would add
-around 500 kB to that bundle. That is why cross-checks are named by string and
-resolved in `profile.ts`.
+**`src/config.ts` and `component/config.ts` take only types from the engine.**
+The page's main thread imports them for the pickers, and pulling in the RDF
+stack would add around 500 kB to that bundle. The engine loads in the worker,
+through `component/engine.ts`.
 
-**A profile's context always replaces the record's own `@context`.** The
-examples name the ontology's released combined context by URL, and validating
-against the profile context is what matches the shapes.
+**A configured context replaces the record's own `@context`; without one, the
+record's own is used.** Every Social Care standard configures its module
+context, because the examples' released combined context defines `outcome`
+twice (safeguarding vs assessments-and-plans; the later wins and fails
+valid-safeguarding-full) and browsers cannot fetch GitHub release assets. Do
+not drop them until the ontology fixes both.
 
-**`--profile` cannot be inferred.** `"@type": "Person"` maps to both
-`person:subject-of-care` and `person:connected`, which hold it to deliberately
-different standards.
+**The standard cannot be inferred from the record.** `"@type": "Person"` maps
+to both Person standards, which hold it to deliberately different rules.
 
 **`sh:closed` is always false.** The upstream generator runs with `--non-closed`.
 
@@ -56,7 +66,10 @@ conform, `invalid-*` must not. Each folder has exactly two valid records:
 `valid-<name>.jsonld` with only the required properties, and
 `valid-<name>-full.jsonld` with every property the shape defines. Standards with
 several record types (safeguarding, assessments-and-plans) hold one node per
-type in a top-level `@graph`. `examples/<module>/expectations.json` also pins
+type in a top-level `@graph`. `src/config.ts` lists the two valid ones per
+standard (the page fetches them from GitHub `main`), and the tests find each
+folder from those URLs and fail if list and folder disagree.
+`examples/<module>/expectations.json` also pins
 the issue code and JSON path each invalid example should produce, so a
 regression in wording fails the build.
 

@@ -3,10 +3,16 @@
     "target": "ES2022",
     "lib": [
       "ES2022",
-      "DOM"
+      "DOM",
+      "DOM.Iterable",
+      "WebWorker"
     ],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [
+      "node",
+      "vite/client"
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -19,6 +25,8 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts",
-    "scripts/**/*.ts"
+    "scripts/**/*.ts",
+    "vite.config.ts",
+    "vitest.config.ts"
   ]
 }
