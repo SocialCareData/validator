@@ -1,12 +1,12 @@
 /*
  * The Social Care page: its own header and footer around the generic
- * validator component, configured with the Social Care standards.
+ * <data-standard-validator> element, configured with the Social Care standards.
  */
 
 import './site.css'
+import '@theodi/data-standard-validator-component'
 import { config } from './config.js'
-import { mountValidator } from './component/index.js'
 
-const root = document.getElementById('validator')
-if (!root) throw new Error('missing #validator')
-mountValidator(root, config)
+const element = document.querySelector('data-standard-validator')
+if (!element) throw new Error('missing <data-standard-validator>')
+element.config = config

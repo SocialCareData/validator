@@ -1,9 +1,10 @@
-/* Social Care Data Validator - the page around the validator component.
+/* Social Care Data Validator - the page around <data-standard-validator>.
    Palette follows standard.socialcaredata.io: a deep blue frame around a white
    working area. On wide screens the page is exactly one window tall, with the
-   component filling the space between header and footer; on phones it stacks
-   and scrolls as a normal page. The component brings its own colour tokens;
-   only the frame's are defined here. */
+   element filling the space between header and footer; on phones it stacks
+   and scrolls as a normal page. The element styles itself inside its shadow
+   root, and its defaults already match this palette; the page's own tokens
+   only have to agree with them. */
 
 :root {
   color-scheme: light dark;
@@ -12,13 +13,20 @@
   --frame-text: #ffffff;
   --frame-muted: rgba(255, 255, 255, 0.72);
   --frame-rule: rgba(255, 255, 255, 0.28);
+  --bg: #ffffff;
+  --text: #152336;
+  --link: #3056a9;
+  --sans: "Helvetica Neue", Arial, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --frame: #0b384f; }
+  :root {
+    --frame: #0b384f;
+    --bg: #0e1a24;
+    --text: #e8eef4;
+    --link: #8fb4f0;
+  }
 }
-
-:root[data-theme="dark"] { --frame: #0b384f; }
 
 html, body { height: 100%; }
 

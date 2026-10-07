@@ -1,5 +1,5 @@
 /*
- * The Social Care standards, as the validator component is configured with them.
+ * The Social Care standards, as the <data-standard-validator> element is configured with them.
  *
  * Shapes are never bundled. They are generated from the LinkML schemas in
  * SocialCareData/standard and published to SocialCareData/ontology, and this
@@ -12,7 +12,7 @@
  * the engine would add ~500 kB to that bundle.
  */
 
-import type { ValidatorConfig } from './component/config.js'
+import type { ValidatorConfig } from '@theodi/data-standard-validator-component/config'
 
 const ONTOLOGY = 'https://github.com/SocialCareData/ontology/blob/main'
 /*

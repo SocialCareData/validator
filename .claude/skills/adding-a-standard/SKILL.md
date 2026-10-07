@@ -7,7 +7,7 @@ description: Add a standard to the validator's config, or change which SHACL sha
 
 A standard pairs one or more SHACL shapes with the JSON-LD context that names
 their fields, and offers two example records on the page. All of it is one
-entry in `src/config.ts`; nothing in `src/component/` changes.
+entry in `src/config.ts`; the `<data-standard-validator>` element does not change.
 
 ## 1. Confirm the files are published
 
@@ -26,7 +26,8 @@ that is not published yet.
 
 `examples/<name>/` in SocialCareData/ontology (a checkout at `ONTOLOGY_DIR`,
 or `../ontology`), named `valid-*.jsonld` and `invalid-*.jsonld`. `valid-*`
-must conform and `invalid-*` must not.
+must conform and `invalid-*` must not; the ontology's *Validate examples*
+workflow checks this.
 
 Write exactly two valid examples: `valid-<name>.jsonld` with only the required
 properties, and `valid-<name>-full.jsonld` giving every shape property a value.
@@ -36,7 +37,7 @@ confirm every property of the full example reaches the RDF.
 
 Give each invalid example exactly one defect where you can, named after it
 (`invalid-bad-postcode.jsonld`). Examples that fail for several unrelated
-reasons still pass the suite but stop documenting anything.
+reasons still pass the check but stop documenting anything.
 
 Declare the same `@context` as the other examples. The configured context
 replaces it, and the report says so.
@@ -72,21 +73,23 @@ once merged into that repository.
 If the new shapes use an `sh:pattern` that reads badly as its description,
 add a `PatternHint` to `patterns` in the same file.
 
-## 4. Pin the expectations
+## 4. Pin the expectations in the ontology
+
+In the ontology checkout:
 
 ```bash
-npm run expectations
-git diff test/expectations/
+python .github/scripts/validate_examples.py --update
+git diff examples/
 ```
 
-This records current behaviour, bugs included. **Read the diff.** Each invalid
-example should show the code and path its filename promises; anything reported
-as `other` means the constraint has no plain-English wording yet — see the
-`validation-messages` skill.
+This writes `examples/<name>/expectations.json`, the violations each invalid
+example produces (focus type, property, SHACL constraint). It records current
+behaviour, bugs included. **Read the diff.** Each invalid example should show
+the defect its filename promises and nothing else.
 
-## 5. Verify
+## 5. Verify here
 
 ```bash
-npm test                   # conformance picks the new folder up from the config
+npm test                   # the config test picks the new folder up
 npm run test:web           # update the expected number of standards there
 ```

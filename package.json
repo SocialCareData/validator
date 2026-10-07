@@ -2,7 +2,7 @@
   "name": "@socialcaredata/validator",
   "version": "0.1.0",
   "private": true,
-  "description": "Validate social care data against the published Social Care MAIS SHACL shapes in the browser. Built on @theodi/data-standard-validator.",
+  "description": "Validate social care data against the published Social Care MAIS SHACL shapes in the browser. Built on @theodi/data-standard-validator-component.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -16,28 +16,22 @@
   "bugs": {
     "url": "https://github.com/SocialCareData/validator/issues"
   },
-  "sideEffects": [
-    "./src/component/worker-globals.ts"
-  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --exclude '**/web.test.ts' --exclude '**/node_modules/**'",
-    "test:web": "vitest run test/web.test.ts",
-    "test:conformance": "vitest run test/conformance.test.ts",
-    "expectations": "vite-node scripts/update-expectations.ts"
+    "test:web": "vitest run test/web.test.ts"
   },
   "dependencies": {
-    "@theodi/data-standard-validator": "github:theodi/data-standard-validator#main"
+    "@theodi/data-standard-validator-component": "github:theodi/data-standard-validator-component#main"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "playwright": "^1.55.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.0",
-    "vite-node": "^2.1.8",
     "vitest": "^2.1.8"
   }
 }

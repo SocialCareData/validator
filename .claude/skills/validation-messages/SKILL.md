@@ -27,11 +27,14 @@ shape's `sh:description` and lifts the example out of any `(e.g. ...)`.
 ## Checking a change against the real standards
 
 ```bash
-(cd ../data-standard-validator && npm run build)   # only for an engine change
-npm run expectations && git diff test/expectations/ # codes and paths must not move
-npm test
-npm run dev                                         # read it as a user would
+npm update @theodi/data-standard-validator-component @theodi/data-standard-validator
+npm run dev        # load each invalid example and read it as a user would
+npm run test:web
 ```
 
+To try an unreleased engine change, build the engine, then the component
+against it, and install the component with
+`npm install --install-links ../data-standard-validator-component`.
+
 An issue with code `other` means the engine has no case for that constraint.
-The conformance suite fails if any example produces one. Fix it upstream.
+Fix it upstream.

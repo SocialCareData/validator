@@ -2,21 +2,23 @@
 
 ```bash
 npm install
-npm run typecheck           # src/, test/ and scripts/
-npm test                    # conformance, integrity, config
+npm run typecheck           # src/ and test/
+npm test                    # the config against the ontology's examples
 ```
 
-Tests fetch real shapes from the ontology repository, so they need a network.
-They read the example records from a local checkout of
+The tests read the example records from a local checkout of
 [SocialCareData/ontology](https://github.com/SocialCareData/ontology): clone it
 next to this repository (`../ontology`), or point `ONTOLOGY_DIR` at one.
-Keep it on `main`, the ref the shapes are fetched at.
+Keep it on `main`, the ref the page fetches examples from.
 
-The validation engine is [@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator), in its own
-repository. Wording, skolemization, the report format and the formatters are
-changed there. This repo holds the validator UI as a generic component, the
-Social Care configuration and page around it, and the conformance suite that
-keeps the engine honest against real standards.
+The UI is [@theodi/data-standard-validator-component](https://github.com/theodi/data-standard-validator-component),
+and the validation engine is [@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator).
+Each is in its own repository. Changes to the toolbar, editor, results or
+styles go in the component. Changes to wording, skolemization, the report
+format and the formatters go in the engine. This repo holds the Social Care
+configuration and the page around the element. The examples, and the
+violations each invalid one must produce, are checked in
+[SocialCareData/ontology](https://github.com/SocialCareData/ontology/blob/main/examples/README.md).
 
 ## Running the web app locally
 
@@ -28,10 +30,17 @@ Then open **<http://localhost:5173/validator/>**. Mind the `/validator/` — the
 app is built with that base path because it is served from
 `socialcaredata.github.io/validator/`, and the bare `/` just redirects there.
 
-Vite reloads on save, including changes to `src/`. To try an engine change on
-the page before it is released, link a local checkout of the library:
-`npm install ../data-standard-validator`, then rebuild the library
-(`npm run build` there) after each change.
+Vite reloads on save, including changes to `src/`. To try an unpushed
+component change on the page, install a local checkout, and repeat after each
+change:
+
+```bash
+npm install --install-links ../data-standard-validator-component
+```
+
+`--install-links` copies the package instead of symlinking it. Vite's dev
+server will not serve the component's worker from outside this repo. Put
+`package.json` back to the `github:` dependency before committing.
 
 To check the real production bundle - the thing GitHub Pages actually serves:
 
@@ -40,7 +49,7 @@ npm run build
 npm run preview             # http://localhost:4173/validator/
 ```
 
-Worth doing before touching anything in the worker: the dev server and the
+Worth doing after a component or engine upgrade: the dev server and the
 production bundle resolve dependencies differently, and the browser-only
 failures this project has hit (`window is not defined` inside the worker) showed
 up in bundling, not in source.
@@ -72,37 +81,25 @@ HEADED=1 SLOWMO=250 npm run test:web   # slowly enough to follow
 npx vitest run test/web.test.ts --reporter verbose
 ```
 
-`npm run typecheck` checks the app, the tests and the scripts together.
+`npm run typecheck` checks the app and the tests together.
 
 ## Layout
 
 ```
-index.html      the Social Care header and footer, around a mount point
+index.html      the Social Care header and footer, around <data-standard-validator>
 public/         static files copied as-is into the build
 src/
   config.ts       the Social Care standards: shape, context and example URLs,
                   descriptions, and plain-English names for the regexes
-  main.ts         mounts the component with src/config.ts
+  main.ts         gives the element src/config.ts
   site.css        the header and footer
-  component/      the validator UI, with nothing specific to Social Care
-    config.ts       the config's types, and how its URLs become fetchable
-    engine.ts       a configured standard, loaded into a ready validator (memoised)
-    mount.ts        the toolbar, editor and results, wired together
-    report.ts       a report, as DOM
-    worker.ts       where validation runs
-scripts/        update-expectations.ts
-test/           conformance, integrity, config, context fallback, web
-  expectations/   the issues each invalid example must report
+test/           config, web
 ```
 
-`src/component/` imports nothing from outside itself except the engine, so
-it can move into its own package unchanged. Keep it that way: anything
-specific to a standard belongs in the config.
-
-`src/config.ts` and `component/config.ts` import nothing from the engine but
-types. The page's main thread imports them to fill the pickers, and keeping the
-RDF stack out of them keeps that bundle small. The validator itself only ever
-loads in the worker.
+`src/config.ts` imports nothing but types, from the component's `/config`
+entry point. The page's main thread imports it, and keeping the RDF stack out
+keeps that bundle small. The validator itself only ever loads in the element's
+worker.
 
 ## Adding a standard
 
@@ -113,30 +110,10 @@ loads in the worker.
    defect. See its [examples/README.md](https://github.com/SocialCareData/ontology/blob/main/examples/README.md).
 2. Add an entry to `src/config.ts`: a name, a one-line description, the shape
    and context URLs, and the two `valid-*` example URLs.
-3. Run `npm test`. The suite finds the folder from the example URLs, and fails
+3. Run `npm test`. It finds the folder from the example URLs, and fails
    if the listed examples and the folder's `valid-*` files disagree.
-4. Regenerate `test/expectations/<name>.json` and **read it**. See below.
-
-## The expectations files
-
-`test/expectations/<module>.json` pins, for every invalid example, the issue
-codes and JSON paths it should produce:
-
-```json
-{
-  "invalid-bad-postcode.jsonld": [
-    { "code": "bad-format", "jsonPath": "address[0].postcode" }
-  ]
-}
-```
-
-The old validator this replaces could only assert *that* an example failed. These
-files assert *what it says*, which is the part users read — so a change that
-quietly degrades a message into "other", or that points at the wrong field, fails
-the build.
-
-Generate them with `npm run expectations`, then review them by hand. A generated expectation that
-nobody has read is just a record of current behaviour, including its bugs.
+4. Update the expected number of standards in `test/web.test.ts`, and run
+   `npm run test:web`.
 
 ## Adding a plain-English message
 
@@ -149,8 +126,8 @@ The one thing that stays here is `patterns` in `src/config.ts`. It holds names f
 regexes the Social Care shapes use, such as "a UK postcode in upper case, with
 an optional space". Add an entry when a new `sh:pattern` reads badly.
 
-After any wording change, run `npm run expectations && git diff test/expectations/`.
-The pinned codes and paths should not move.
+After any wording change, run `npm run dev` and load the invalid examples to
+read the result as a user would.
 
 ## Deploying
 
@@ -159,9 +136,10 @@ it to GitHub Pages on every push to `main` that touches the app (`src/`,
 `public/`, `index.html`). Examples are fetched from the ontology repository
 at run time, so a change there needs no redeploy. It needs Settings → Pages → Source: **GitHub Actions**, once.
 
-To pick up a new engine release, bump `@theodi/data-standard-validator` in
-`package.json`. Then run `npm test` and `npm run test:web`. A flipped verdict
-in the conformance suite is a regression in the engine, not an improvement.
+Both packages are git dependencies on `main`, pinned to a commit by
+`package-lock.json`. To pick up newer ones, run
+`npm update @theodi/data-standard-validator-component @theodi/data-standard-validator`,
+then `npm test` and `npm run test:web`.
 
 To pin the page to an ontology tag, set `ref` in `src/config.ts` (or change
 `main` in its URLs), and run `npm test`.

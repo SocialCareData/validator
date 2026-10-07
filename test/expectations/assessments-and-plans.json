@@ -1,8 +1,0 @@
-{
-  "invalid-assessment-missing-personId.jsonld": [
-    {
-      "code": "required-field-missing",
-      "jsonPath": "personId"
-    }
-  ]
-}

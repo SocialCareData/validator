@@ -1,32 +1,19 @@
 /*
- * The configured standards, loaded the way the page's worker loads them, and
- * pointed at a local checkout of SocialCareData/ontology's examples rather
- * than the ones on GitHub.
+ * The configured standards, and where their examples sit in a local checkout
+ * of SocialCareData/ontology rather than on GitHub.
  */
 
 import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { Validator } from '@theodi/data-standard-validator'
 import { config } from '../src/config.js'
 import {
-  defaultRef, exampleList, parseGitHubUrl, resolveStandard, type StandardConfig,
-} from '../src/component/config.js'
-import { loadValidator, type LoadOptions } from '../src/component/engine.js'
+  exampleList, parseGitHubUrl, type StandardConfig,
+} from '@theodi/data-standard-validator-component/config'
 
 export const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 export const standards: readonly StandardConfig[] = config.standards
-
-export function validatorFor (
-  standard: StandardConfig, opts: Partial<LoadOptions> = {},
-): Promise<Validator> {
-  return loadValidator({
-    ...resolveStandard(standard, defaultRef(config)),
-    ...(config.patterns !== undefined ? { patterns: config.patterns } : {}),
-    ...opts,
-  })
-}
 
 /**
  * The local checkout of SocialCareData/ontology that holds the examples: the
@@ -36,8 +23,7 @@ export const ontologyDir = resolve(process.env['ONTOLOGY_DIR'] ?? join(root, '..
 
 /**
  * A standard's examples, as the path below `examples/` in the ontology
- * repository: the folder of its first configured example. The invalid examples
- * live alongside, unlisted, as the conformance suite's negative cases.
+ * repository: the folder of its first configured example.
  */
 export function examplesPath (standard: StandardConfig): string {
   const first = exampleList(standard)[0]
@@ -58,12 +44,4 @@ export function examplesDir (standard: StandardConfig): string {
 
 export function exampleFiles (standard: StandardConfig): string[] {
   return readdirSync(examplesDir(standard)).filter((f) => f.endsWith('.jsonld')).sort()
-}
-
-/**
- * What a standard's invalid examples should report. Kept here rather than with
- * the examples, because it pins this validator's wording, not the standard.
- */
-export function expectationsFile (standard: StandardConfig): string {
-  return join(root, 'test', 'expectations', `${examplesPath(standard)}.json`)
 }
