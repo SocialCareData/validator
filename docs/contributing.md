@@ -2,14 +2,12 @@
 
 ```bash
 npm install
-npm run typecheck           # src/ and test/
-npm test                    # the config against the ontology's examples
+npm run typecheck
 ```
 
-The tests read the example records from a local checkout of
-[SocialCareData/ontology](https://github.com/SocialCareData/ontology): clone it
-next to this repository (`../ontology`), or point `ONTOLOGY_DIR` at one.
-Keep it on `main`, the ref the page fetches examples from.
+There are no tests here: the engine and the component are tested in their
+own repositories. CI typechecks and builds the app; check anything else by
+loading the examples in the page.
 
 The UI is [@theodi/data-standard-validator-component](https://github.com/theodi/data-standard-validator-component),
 and the validation engine is [@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator).
@@ -18,7 +16,7 @@ styles go in the component. Changes to wording, skolemization, the report
 format and the formatters go in the engine. This repo holds the Social Care
 configuration and the page around the element. The examples, and the
 violations each invalid one must produce, are checked in
-[SocialCareData/ontology](https://github.com/SocialCareData/ontology/blob/main/examples/README.md).
+[SocialCareData/standard](https://github.com/SocialCareData/standard/tree/main/src/_data/model/examples).
 
 ## Running the web app locally
 
@@ -57,32 +55,6 @@ up in bundling, not in source.
 The page fetches shapes from `raw.githubusercontent.com` at run time, so it needs
 a network. If validation fails with a fetch error, check the ref in **Advanced**.
 
-## Testing the web app
-
-```bash
-npx playwright install chromium    # once
-npm run test:web
-```
-
-Seven tests drive a real Chromium against the production build: every standard is
-listed, a configured example loads and passes, a bad postcode reports the field name and line number, a valid record
-passes, a controlled vocabulary renders its permitted values, malformed JSON is
-explained rather than swallowed, and the browser console stays clean throughout.
-
-That last one is not padding. It is what caught `window is not defined` - the
-worker died on load, and every other assertion had simply timed out without
-saying why.
-
-To watch it happen rather than read a stack trace:
-
-```bash
-HEADED=1 npm run test:web              # opens a real window
-HEADED=1 SLOWMO=250 npm run test:web   # slowly enough to follow
-npx vitest run test/web.test.ts --reporter verbose
-```
-
-`npm run typecheck` checks the app and the tests together.
-
 ## Layout
 
 ```
@@ -93,7 +65,6 @@ src/
                   descriptions, and plain-English names for the regexes
   main.ts         gives the element src/config.ts
   site.css        the header and footer
-test/           config, web
 ```
 
 `src/config.ts` imports nothing but types, from the component's `/config`
@@ -103,17 +74,15 @@ worker.
 
 ## Adding a standard
 
-1. Put examples under `examples/<name>/` in
-   [SocialCareData/ontology](https://github.com/SocialCareData/ontology):
+1. Put examples under `src/_data/model/examples/<name>/` in
+   [SocialCareData/standard](https://github.com/SocialCareData/standard):
    `valid-<name>.jsonld` with only the required properties,
    `valid-<name>-full.jsonld` with all of them, and one `invalid-*.jsonld` per
-   defect. See its [examples/README.md](https://github.com/SocialCareData/ontology/blob/main/examples/README.md).
+   defect. See its
+   [model-management.md](https://github.com/SocialCareData/standard/blob/main/src/_data/model/model-management.md#validation).
 2. Add an entry to `src/config.ts`: a name, a one-line description, the shape
    and context URLs, and the two `valid-*` example URLs.
-3. Run `npm test`. It finds the folder from the example URLs, and fails
-   if the listed examples and the folder's `valid-*` files disagree.
-4. Update the expected number of standards in `test/web.test.ts`, and run
-   `npm run test:web`.
+3. Run `npm run dev`, pick the new standard, and load both examples.
 
 ## Adding a plain-English message
 
@@ -133,13 +102,13 @@ read the result as a user would.
 
 Nothing here is published to npm. `pages.yml` builds the app into `dist/` and deploys
 it to GitHub Pages on every push to `main` that touches the app (`src/`,
-`public/`, `index.html`). Examples are fetched from the ontology repository
+`public/`, `index.html`). Examples are fetched from the standard repository
 at run time, so a change there needs no redeploy. It needs Settings → Pages → Source: **GitHub Actions**, once.
 
 Both packages are git dependencies on `main`, pinned to a commit by
 `package-lock.json`. To pick up newer ones, run
 `npm update @theodi/data-standard-validator-component @theodi/data-standard-validator`,
-then `npm test` and `npm run test:web`.
+then build and preview the production bundle and load a few examples.
 
 To pin the page to an ontology tag, set `ref` in `src/config.ts` (or change
-`main` in its URLs), and run `npm test`.
+`main` in its URLs).

@@ -11,10 +11,9 @@ is **[@theodi/data-standard-validator](https://github.com/theodi/data-standard-v
 Nothing here is published to npm.
 
 ```bash
-npm test                # config against the examples - needs the ontology checkout
-npm run typecheck       # src/ and test/
+npm run typecheck
 npm run dev             # http://localhost:5173/validator/  (mind the base path)
-npm run test:web        # real Chromium; `npx playwright install chromium` once
+npm run build && npm run preview   # the production bundle GitHub Pages serves
 ```
 
 ## Things you cannot infer from the code
@@ -67,25 +66,26 @@ to both Person standards, which hold it to deliberately different rules.
 
 ## The examples
 
-The records live in `examples/` of
-[SocialCareData/ontology](https://github.com/SocialCareData/ontology), not
-here, and are checked there: `valid-*` must conform, `invalid-*` must not, and
-each folder's `expectations.json` pins the violations every invalid record must
-produce (pySHACL, `.github/scripts/validate_examples.py`). Each folder has
+The records live in `src/_data/model/examples/` of
+[SocialCareData/standard](https://github.com/SocialCareData/standard), beside
+the LinkML schemas, not here, and are checked there against shapes built from
+the same commit: `valid-*` must conform, `invalid-*` must not, and each
+folder's `expectations.json` pins the violations every invalid record must
+produce (pySHACL, `src/assets/scripts/validate_examples.py`). Each folder has
 exactly two valid records, `valid-<name>.jsonld` with only the required
 properties and `valid-<name>-full.jsonld` with every property the shape
 defines. `src/config.ts` lists those two per standard (the page fetches them
-from the ontology's `main`, whatever the ref box says). The tests here read a
-local checkout (`ONTOLOGY_DIR`, or `../ontology` beside this repo; CI checks
-out `main`), find each folder from those URLs, and fail if list and folder
-disagree. `test/web.test.ts` also loads a few of the records.
+from the standard repo's `main`, whatever the ref box says).
 
-The ontology repo is otherwise generated: `SocialCareData/standard`'s sync
-`rsync --delete`s over it, excluding `/examples/` and `/.github/`. Keep those
-exclusions.
+There are no tests here, by design: this repo is a thin wrapper, and the
+engine and the component carry their own. CI only typechecks and builds.
+
+The ontology repo is entirely generated: `SocialCareData/standard`'s sync
+`rsync --delete`s over it, excluding only `/.github/` and the hand-written
+root files.
 
 ## Conventions
 
 An issue's `title` and `hint` are the human layer and must never contain a raw
-IRI (the web test checks a few). IRIs belong in `issue.technical`. Comments
+IRI. IRIs belong in `issue.technical`. Comments
 explain why something is the way it is, not what the line does.

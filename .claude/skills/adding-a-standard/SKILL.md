@@ -24,10 +24,10 @@ that is not published yet.
 
 ## 2. Add examples
 
-`examples/<name>/` in SocialCareData/ontology (a checkout at `ONTOLOGY_DIR`,
-or `../ontology`), named `valid-*.jsonld` and `invalid-*.jsonld`. `valid-*`
-must conform and `invalid-*` must not; the ontology's *Validate examples*
-workflow checks this.
+`src/_data/model/examples/<name>/` in SocialCareData/standard, named `valid-*.jsonld` and `invalid-*.jsonld`.
+`valid-*` must conform and `invalid-*` must not; the standard's
+*Validate standards* workflow checks this (`src/assets/scripts/validate_examples.py`,
+`--update` to pin the violations in `expectations.json`).
 
 Write exactly two valid examples: `valid-<name>.jsonld` with only the required
 properties, and `valid-<name>-full.jsonld` giving every shape property a value.
@@ -90,6 +90,6 @@ the defect its filename promises and nothing else.
 ## 5. Verify here
 
 ```bash
-npm test                   # the config test picks the new folder up
-npm run test:web           # update the expected number of standards there
+npm run typecheck
+npm run dev                # pick the new standard and load both examples
 ```

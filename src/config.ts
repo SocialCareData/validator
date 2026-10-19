@@ -16,11 +16,10 @@ import type { ValidatorConfig } from '@theodi/data-standard-validator-component/
 
 const ONTOLOGY = 'https://github.com/SocialCareData/ontology/blob/main'
 /*
- * The examples sit beside the shapes but are not versioned with them: the ref
- * box changes only shapes and contexts, and tags older than the examples'
- * move to the ontology repository have none.
+ * The examples live beside the LinkML schemas in SocialCareData/standard and
+ * are not versioned with the shapes: the ref box changes only shapes and contexts.
  */
-const EXAMPLES = `${ONTOLOGY}/examples`
+const EXAMPLES = 'https://github.com/SocialCareData/standard/blob/main/src/_data/model/examples'
 
 /*
  * Every standard names its module context, although the examples declare the

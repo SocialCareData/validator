@@ -29,7 +29,6 @@ shape's `sh:description` and lifts the example out of any `(e.g. ...)`.
 ```bash
 npm update @theodi/data-standard-validator-component @theodi/data-standard-validator
 npm run dev        # load each invalid example and read it as a user would
-npm run test:web
 ```
 
 To try an unreleased engine change, build the engine, then the component

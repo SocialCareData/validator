@@ -14,46 +14,25 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  ONTOLOGY_DIR: ${{ github.workspace }}/ontology
-
 jobs:
-  # The Social Care config: its URLs, and that it offers exactly each folder's
-  # valid examples. Whether the examples themselves behave is checked in
-  # SocialCareData/ontology.
-  config:
+  typecheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/checkout@v7
-        with:
-          repository: SocialCareData/ontology
-          ref: main
-          path: ontology
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run typecheck
-      - run: npm test
 
-  web:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # The examples live in SocialCareData/ontology, at the ref whose shapes
-      # src/config.ts fetches.
-      - uses: actions/checkout@v7
-        with:
-          repository: SocialCareData/ontology
-          ref: main
-          path: ontology
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:web

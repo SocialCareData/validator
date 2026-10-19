@@ -22,7 +22,6 @@ This repository holds:
 | --- | --- |
 | `src/config.ts` | The five standards: their shape, context and example URLs, plus plain-English names for the regexes the shapes use |
 | `index.html`, `src/main.ts`, `src/site.css` | The GitHub Pages app: the Social Care header and footer around the `<data-standard-validator>` element, configured with `src/config.ts` |
-| `test/` | Checks that the config offers each folder's valid examples in [SocialCareData/ontology](https://github.com/SocialCareData/ontology/tree/main/examples), and a browser test of the built page. The examples themselves, and the violations each invalid one must produce, are checked in that repository |
 
 Nothing here is published to npm.
 

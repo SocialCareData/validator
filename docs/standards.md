@@ -65,7 +65,7 @@ yet:
 
 ## Adding a standard
 
-Add an entry to `src/config.ts`, put its examples under `examples/<name>/` in
-SocialCareData/ontology following the `valid-*` / `invalid-*` convention, and list the two `valid-*`
-files in the entry. The config test picks the folder up from those
-example URLs. See [contributing](contributing.md).
+Add an entry to `src/config.ts`, put its examples under
+`src/_data/model/examples/<name>/` in SocialCareData/standard following the
+`valid-*` / `invalid-*` convention, and list the two `valid-*`
+files in the entry. See [contributing](contributing.md).
