@@ -7,6 +7,11 @@ browser.
 **[Open the validator →](https://socialcaredata.github.io/validator/)** Paste a
 record, pick a standard, and see what needs fixing.
 
+A link can open the page on a standard with a record already loaded and
+validated, using `shape`, `context` and `example` query parameters, for example
+[a valid placement](https://socialcaredata.github.io/validator/?shape=https://github.com/SocialCareData/ontology/blob/main/placements/placements-standard-shape.ttl&context=https://github.com/SocialCareData/ontology/blob/main/placements/context.jsonld&example=https://github.com/SocialCareData/standard/blob/main/src/_data/model/examples/placements/valid-placement.jsonld).
+See [linking to a record](docs/getting-started.md#linking-to-a-record).
+
 ## What lives where
 
 This repository is the web application only. The UI is the generic
