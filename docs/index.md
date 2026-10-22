@@ -1,16 +1,12 @@
 # Documentation
 
-- **[Getting started](getting-started.md)** — install, first validation, reading
-  the output.
-- **[Command line](cli.md)** — every command and flag, exit codes, CI recipes,
-  offline use.
-- **[Library API](api.md)** — using it from Node or the browser.
-- **[Profiles and shapes](profiles.md)** — what each profile covers, where the
-  shapes come from, how to pin a version.
-- **[Error reference](error-reference.md)** — what every message means and how to
-  fix it.
-- **[How it works](how-it-works.md)** — JSON-LD to RDF to SHACL, and the two
-  tricks that make the output readable.
-- **[Limitations](limitations.md)** — what this tool does not do.
-- **[Contributing](contributing.md)** — layout, adding a profile, the expectations
-  files, releasing.
+- **[Getting started](getting-started.md)**: using the web page.
+- **[Standards and shapes](standards.md)**: what each standard covers, where the
+  shapes come from, and how to pin a version.
+- **[Limitations](limitations.md)**: what the page does not do.
+- **[Contributing](contributing.md)**: the layout, and adding a standard.
+
+The validation engine, including its command-line tool, is documented at
+[theodi/data-standard-validator](https://github.com/theodi/data-standard-validator).
+[What every issue code means](https://github.com/theodi/data-standard-validator/blob/main/docs/error-reference.md)
+is there too.

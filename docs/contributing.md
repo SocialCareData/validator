@@ -2,34 +2,52 @@
 
 ```bash
 npm install
-npm run typecheck           # src only - what gets published
-npm test                    # unit, conformance, integrity, cross-record, structure
+npm run typecheck
 ```
 
-Tests fetch real shapes from the ontology repository, so they need a network.
+There are no tests here: the engine and the component are tested in their
+own repositories. CI typechecks and builds the app; check anything else by
+loading the examples in the page.
+
+The UI is [@theodi/data-standard-validator-component](https://github.com/theodi/data-standard-validator-component),
+and the validation engine is [@theodi/data-standard-validator](https://github.com/theodi/data-standard-validator).
+Each is in its own repository. Changes to the toolbar, editor, results or
+styles go in the component. Changes to wording, skolemization, the report
+format and the formatters go in the engine. This repo holds the Social Care
+configuration and the page around the element. The examples, and the
+violations each invalid one must produce, are checked in
+[SocialCareData/standard](https://github.com/SocialCareData/standard/tree/main/src/_data/model/examples).
 
 ## Running the web app locally
 
 ```bash
-npm run dev:web
+npm run dev
 ```
 
 Then open **<http://localhost:5173/validator/>**. Mind the `/validator/` — the
 app is built with that base path because it is served from
 `socialcaredata.github.io/validator/`, and the bare `/` just redirects there.
 
-Vite reloads on save, and that includes `src/`: the page imports the library
-source directly rather than the built `dist/`, so a change to a message or a
-shape-fact is on screen as soon as you save it. No `npm run build` in the loop.
+Vite reloads on save, including changes to `src/`. To try an unpushed
+component change on the page, install a local checkout, and repeat after each
+change:
+
+```bash
+npm install --install-links ../data-standard-validator-component
+```
+
+`--install-links` copies the package instead of symlinking it. Vite's dev
+server will not serve the component's worker from outside this repo. Put
+`package.json` back to the `github:` dependency before committing.
 
 To check the real production bundle - the thing GitHub Pages actually serves:
 
 ```bash
-npm run build:web
+npm run build
 npm run preview             # http://localhost:4173/validator/
 ```
 
-Worth doing before touching anything in the worker: the dev server and the
+Worth doing after a component or engine upgrade: the dev server and the
 production bundle resolve dependencies differently, and the browser-only
 failures this project has hit (`window is not defined` inside the worker) showed
 up in bundling, not in source.
@@ -37,144 +55,60 @@ up in bundling, not in source.
 The page fetches shapes from `raw.githubusercontent.com` at run time, so it needs
 a network. If validation fails with a fetch error, check the ref in **Advanced**.
 
-## Testing the web app
-
-```bash
-npx playwright install chromium    # once
-npm run test:web
-```
-
-Six tests drive a real Chromium against a real dev server: every profile is
-listed, a bad postcode reports the field name and line number, a valid record
-passes, a controlled vocabulary renders its permitted values, malformed JSON is
-explained rather than swallowed, and the browser console stays clean throughout.
-
-That last one is not padding. It is what caught `window is not defined` - the
-worker died on load, and every other assertion had simply timed out without
-saying why.
-
-To watch it happen rather than read a stack trace:
-
-```bash
-HEADED=1 npm run test:web              # opens a real window
-HEADED=1 SLOWMO=250 npm run test:web   # slowly enough to follow
-npx vitest run test/web.test.ts --reporter verbose
-```
-
-`npm run typecheck:web` typechecks the app. It is deliberately separate from
-`npm run typecheck`, which covers only `src/` - what gets published.
-
 ## Layout
 
 ```
-src/        the published package - the library and the CLI
-web/        the GitHub Pages app - never published to npm
-examples/   the conformance fixtures
-```
-
-`src/` is laid out as the path a record takes through the tool:
-
-```
+index.html      the Social Care header and footer, around <data-standard-validator>
+public/         static files copied as-is into the build
 src/
-  index.ts            the public API
-  cli.ts              the command line
-  validator.ts        the pipeline that ties the four stages together
-
-  shapes/             1. where the shapes come from
-    catalogue.ts        which profiles exist, and which files each one loads
-    fetch.ts            fetching a text file over HTTPS
-    profile.ts          a profile, loaded and ready to validate against
-
-  document/           2. the user's JSON, on its way to RDF - and back
-    skolemize.ts        naming anonymous nodes; locating pointers in the source
-    context.ts          reading a JSON-LD context backwards
-    jsonld.ts           choosing a context, and converting to RDF
-
-  rdf/                3. the RDF layer
-    parse.ts            Turtle and N-Quads into a dataset
-    shacl.ts            the engine, and the guard skolemization depends on
-    cross-checks.ts     constraints that span a whole set of records
-
-  report/             4. results, in English
-    types.ts            the report contract
-    shape-facts.ts      reading constraints back off the shape that raised them
-    messages.ts         a constraint, as a sentence
-    build.ts            SHACL results -> issues, and grouping them
-    pretty.ts           terminal output
-
-  types/vendor.d.ts   ambient declarations for the untyped RDF stack
+  config.ts       the Social Care standards: shape, context and example URLs,
+                  descriptions, and plain-English names for the regexes
+  main.ts         gives the element src/config.ts
+  site.css        the header and footer
 ```
 
-That reading order is the pipeline, not the dependency order. Imports form a DAG
-with no cycles, and it runs the other way: `rdf/` depends on nothing else here,
-`document/` builds on `rdf/`, `report/` builds on both, and `shapes/` uses all
-three to assemble a profile. `validator.ts` is the only module that reaches into
-every folder. `test/architecture.test.ts` checks this, so a new import that
-breaks it fails the build rather than quietly eroding the structure.
+`src/config.ts` imports nothing but types, from the component's `/config`
+entry point. The page's main thread imports it, and keeping the RDF stack out
+keeps that bundle small. The validator itself only ever loads in the element's
+worker.
 
-**Two rules about the split.** `src/` is what gets published, so nothing that
-exists only for the web page belongs there — the profile descriptions in the
-`<select>`, for instance, live in `web/src/descriptions.ts`. And only `cli.ts`
-may import `node:` builtins; everything else has to run in a browser.
+## Adding a standard
 
-## Adding a profile
-
-1. Add an entry to `src/shapes/catalogue.ts` — shape files, context, and any
-   cross-record checks. If it should appear in the web picker, add a line to
-   `web/src/descriptions.ts` too.
-2. Put examples under `examples/<name>/`: `valid-<name>.jsonld` with only the
-   required properties, `valid-<name>-full.jsonld` with all of them, and one
-   `invalid-*.jsonld` per defect. See [examples/README.md](../examples/README.md).
-3. Run `npm run test:conformance`. The suite discovers the new folder
-   automatically.
-4. Regenerate `examples/<name>/expectations.json` and **read it**. See below.
-
-## The expectations files
-
-`examples/<module>/expectations.json` pins, for every invalid example, the issue
-codes and JSON paths it should produce:
-
-```json
-{
-  "invalid-bad-postcode.jsonld": [
-    { "code": "bad-format", "jsonPath": "address[0].postcode" }
-  ]
-}
-```
-
-The old validator this replaces could only assert *that* an example failed. These
-files assert *what it says*, which is the part users read — so a change that
-quietly degrades a message into "other", or that points at the wrong field, fails
-the build.
-
-Generate them from a run, then review them by hand. A generated expectation that
-nobody has read is just a record of current behaviour, including its bugs.
+1. Put examples under `src/_data/model/examples/<name>/` in
+   [SocialCareData/standard](https://github.com/SocialCareData/standard):
+   `valid-<name>.jsonld` with only the required properties,
+   `valid-<name>-full.jsonld` with all of them, and one `invalid-*.jsonld` per
+   defect. See its
+   [model-management.md](https://github.com/SocialCareData/standard/blob/main/src/_data/model/model-management.md#validation).
+2. Add an entry to `src/config.ts`: a name, a one-line description, the shape
+   and context URLs, and the two `valid-*` example URLs.
+3. Run `npm run dev`, pick the new standard, and load both examples.
 
 ## Adding a plain-English message
 
-`src/report/messages.ts` maps SHACL constraint components to sentences. Add a case
-there, a test in `test/unit/messages.test.ts`, and a section in
-`docs/error-reference.md` — the code is a documented interface.
+Messages are built by the engine, in
+[`src/report/messages.ts`](https://github.com/theodi/data-standard-validator/blob/main/src/report/messages.ts) of the library
+repository. Change them there, with a test and an entry in its
+`docs/error-reference.md`.
 
-Two rules for the wording:
+The one thing that stays here is `patterns` in `src/config.ts`. It holds names for the
+regexes the Social Care shapes use, such as "a UK postcode in upper case, with
+an optional space". Add an entry when a new `sh:pattern` reads badly.
 
-- **No IRIs in the human layer.** A test enforces this. IRIs go in `technical`.
-- **Say what would be right**, not only what is wrong. "must be one of: home,
-  work, temp" beats "value not allowed".
+After any wording change, run `npm run dev` and load the invalid examples to
+read the result as a user would.
 
-## Releasing
+## Deploying
 
-1. Update the version in `package.json` and open a pull request.
-2. Once merged, create a GitHub Release tagged `vX.Y.Z`.
-3. `release.yml` checks the tag matches `package.json`, runs the src-only
-   test suite, builds and publishes to npm with provenance. The web app is not
-   built or shipped.
+Nothing here is published to npm. `pages.yml` builds the app into `dist/` and deploys
+it to GitHub Pages on every push to `main` that touches the app (`src/`,
+`public/`, `index.html`). Examples are fetched from the standard repository
+at run time, so a change there needs no redeploy. It needs Settings → Pages → Source: **GitHub Actions**, once.
 
-Publishing needs the `@socialcaredata` scope on npm and this repository allowed
-to publish to it; prefer
-[trusted publishing](https://docs.npmjs.com/trusted-publishers), which needs no
-secret. GitHub Pages needs Settings → Pages → Source: **GitHub Actions**, once.
+Both packages are git dependencies on `main`, pinned to a commit by
+`package-lock.json`. To pick up newer ones, run
+`npm update @theodi/data-standard-validator-component @theodi/data-standard-validator`,
+then build and preview the production bundle and load a few examples.
 
-When the ontology repo cuts its first tag, change `DEFAULT_REF` in
-`src/shapes/catalogue.ts` from `main` to that tag, run `npm run test:conformance`, and
-release.
+To pin the page to an ontology tag, set `ref` in `src/config.ts` (or change
+`main` in its URLs).
